@@ -1,0 +1,274 @@
+{% extends "base.html" %}
+ 
+{% block content %}
+<div class="container">
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+            {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+    <div class="mb-3 text-start">
+        <a href="{{ request.META.HTTP_REFERER }}" class="text-decoration-none" style="color: inherit; font-size: 0.9rem;">
+          <i class="fas fa-arrow-circle-left me-1"></i> الرجوع للصفحة السابقة
+        </a>
+    </div>
+    {% if announce_form or course_form or homeWork_form or activity_form %}    
+        {% if announce_form %}
+            <center> <h4 class="text-dark"> تعديل الإعلان  </h4> </center>
+            <form action="{% url 'Update' announce_form.id %}?editing_data=announce" method="post">
+                {% csrf_token %}
+                <div class="">
+                    <label for="">عنوان الإعلان</label>
+                    <input type="title" class="form-control" name="title" value="{{announce_form.title}}" required>
+
+                    <label for="">محتوى الإعلان</label>
+                    <textarea type="content"  class="form-control"  name="content" id="" required>{{announce_form.content}}</textarea>
+
+                    <div class="d-flex justify-content-end">
+                        <button class="my-2 btn btn-outline-success">تعديل الإعلان</button>
+                    </div>
+                </div>
+            </form>
+        {% endif %}
+
+        {% if course_form %}
+            <center> <h4 class="text-dark"> تعديل الدرس </h4> </center>
+            <form action="{% url 'Update' course_form.id %}?editing_data=course" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="">
+                    <label class="mt-2"  for="">عنوان الدرس</label>
+                    <input type="title" class="form-control" name="title" value="{{course_form.title}}" required>
+
+                    <label class="mt-2" for="">المادة</label>
+                    <select class="form-control" name="material" required>
+                        {% for m in all_materials %}
+                        <option value="{{m.name}}" {% if m == course_form.material %}selected{% endif %}> {{m.name}} </option>
+                        {% endfor %}
+                    </select>
+                    <br>
+                    <label class="mt-2" for="">القسم:</label>
+                    <select class="form-control"  name="section" multiple >
+                        {% for s in all_sections %}
+                        <option value="{{s.name}}"  {% if s in course_form.section.all %}selected{% endif %}>{{s.name}}</option>
+                        {% endfor %}
+                    </select>
+                    <br>
+
+                    <label class="mt-2" for="">مقدمة الدرس</label>
+                    <textarea type="text"  class="form-control"  name="introduction" required>{{course_form.introduction}}</textarea>
+
+                    <label class="mt-2" for="">محتوى الدرس</label>
+                    <textarea type="text"  class="form-control"  name="subject" rows="9" required>{{course_form.subject}}</textarea>
+
+                    <label class="mt-2" for="">خاتمة الدرس</label>
+                    <textarea type="text"  class="form-control"  name="conclusion" required>{{course_form.conclusion}}</textarea>
+
+                    <br>
+                    {% if course_form.image_set.all %}
+                        <label class="mt-2" for=""> ملحقات <p style="font-size: small; display:inline-block">(من أجل تعديل الملحقات يرجى التوجه نحو لوحة الإدارة)</p></label>
+                            {% for i in course_form.image_set.all %}
+                                {% if i.image %}
+                                    <br>
+                                        <a class="text-dark" href="{{ i.image.url }}" target="_blank">📂 {{ i.title }}</a>
+                                    <a href="http://127.0.0.1:8000/admin/home/image/{{i.id}}/change/" class="text-info" target="_blank">انقر للتعديل</a>
+                                    <br>
+                                {% else %}
+                                    <p>هذا الملحق لا يحتوي على صور.</p>
+                                {% endif %}
+                            {% endfor %}
+                    {% else %}
+                        <h4 class="my-4">إضافة ملفات</h4>
+                        {{ CourseFormSet.management_form }} 
+                        <div id="form-container"> 
+                            {% for course_form in CourseFormSet %}
+                                <div class="file-upload ">
+                                    {{ course_form.as_p }}
+                                    {% if not forloop.first %}
+                                        <button type="button" class="remove-form">إزالة</button>
+                                    {% endif %}
+                                    <br>
+                                    <hr>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        <button type="button" id="add-form" class="btn btn-secondary my-1">إضافة ملف آخر</button>
+                        {% endif %}
+
+                    <div class="d-flex justify-content-end ">
+                        <button class="my-2 btn btn-outline-success">تعديل الدرس</button>
+                    </div>
+                </div>
+            </form>
+        {% endif %}
+        
+        {% if homeWork_form %}
+            <center> <h4 class="text-info"> تعديل الواجب الدراسي </h4> </center>
+            <form action="{% url 'Update' homeWork_form.id %}?editing_data=homework" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="">
+                    <label class="mt-2" for="">عنوان الواجب الدراسي</label>
+                    <input type="title" class="form-control" name="title" value="{{homeWork_form.title}}" required>
+
+                    <label class="mt-2" for="">المادة</label>
+                    <textarea type="text"  class="form-control"  name="material" required>{{homeWork_form.material}}</textarea>
+
+                    <label class="mt-2" for="">القسم</label>
+                    <select class="form-control" name="section" multiple required>
+                        {% for sec in all_sections %}
+                            <option value="{{ sec.name }}" {% if sec in homeWork_form.section.all %}selected{% endif %}>
+                                {{ sec.name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                    
+                    <label class="mt-2" for=""> محتوى الواجب الدراسي</label>
+                    <textarea type="text"  class="form-control"  name="content" rows="9" required>{{homeWork_form.content}}</textarea>
+
+                    <label class="mt-2" for="">أجل التقديم</label>
+                    <input type="date" name="lastDate" required value="{{homeWork_form.lastDate|date:'Y-m-d'}}">
+
+                    {% if homeWork_form.files_set.all %}
+                        <br>
+                        <label class="mt-2" for=""> ملحقات <p style="font-size: small; display:inline-block">(من أجل تعديل الملحقات يرجى التوجه نحو لوحة الإدارة)</p></label>
+                        {% for f in homeWork_form.files_set.all %}
+                            <br>
+                            {% if f.file %}
+                            <a class="text-dark" href="{{ f.file.url }}" target="_blank">📂 {{ f.file.name }}</a>
+                            {% else %}
+                            <p>هذا الملحق لا يتضمن ملفات</p>
+                            {% endif %}
+                            <a href="http://127.0.0.1:8000/admin/home/files/{{f.id}}/change/" class="text-info" target="_blank">انقر للتعديل</a>
+                            <br>
+                        {% endfor %}
+                    {% else %}
+                        <h4 class="my-4">إضافة ملفات</h4>
+                        {{ FileFormSet.management_form }} 
+                        <div id="form-container"> 
+                            {% for file_form in FileFormSet %}
+                                <div class="file-upload ">
+                                    {{ file_form.as_p }}
+                                    {% if not forloop.first %}
+                                        <button type="button" class="remove-form">إزالة</button>
+                                    {% endif %}
+                                    <br>
+                                    <hr>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        <button type="button" id="add-form" class="btn btn-secondary my-1">إضافة ملف آخر</button>
+                        {% endif %}
+
+
+                    <div class="d-flex justify-content-end ">
+                        <button class="my-2 btn btn-outline-success">تعديل الواجب الدراسي</button>
+                    </div>
+                </div>
+            </form>
+
+        {% endif %}
+
+        {% if activity_form %}
+            <center> <h4 class="text-dark"> تعديل النشاط </h4> </center>
+
+            <form action="{% url 'Update' activity_form.id %}?editing_data=activity" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="">
+                    <label class="mt-2"  for="">عنوان النشاط</label>
+                    <input type="title" class="form-control" name="title" value="{{activity_form.title}}" required>
+
+                    <br>
+
+                    <label class="mt-2" for="">تاريخ النشاط</label>
+                    <textarea type="text"  class="form-control"  name="dateTime" required>{{activity_form.dateTime|date:'Y-m-d'}}</textarea>
+                    
+                    <br>
+                    <label class="mt-2" for="">محتوى النشاط</label>
+                    <textarea type="text"  class="form-control"  name="content" rows="9" required>{{activity_form.content}}</textarea>
+
+
+                    {% if activity_form.image_set.all %}
+                        <label class="mt-2" for=""> ملحقات <p style="font-size: small; display:inline-block">(من أجل تعديل الملحقات يرجى التوجه نحو لوحة الإدارة)</p></label>
+                            {% for i in activity_form.image_set.all %}
+                                {% if i.image %}
+                                    <br>
+                                        <a class="text-dark" href="{{ i.image.url }}" target="_blank">📂 {{ i.title }}</a>
+                                    <a href="http://127.0.0.1:8000/admin/home/image/{{i.id}}/change/" class="text-info" target="_blank">انقر للتعديل</a>
+                                    <br>
+                                {% else %}
+                                    <p>هذا الملحق لا يحتوي على صور.</p>
+                                {% endif %}
+                            {% endfor %}
+                    {% else %}
+                        <h4 class="my-4">إضافة ملفات</h4>
+                        {{ activityFormSet.management_form }} 
+                        <div id="form-container"> 
+                            {% for activityForm in activityFormSet %}
+                                <div class="file-upload ">
+                                    {{ activityForm.as_p }}
+                                    {% if not forloop.first %}
+                                        <button type="button" class="remove-form">إزالة</button>
+                                    {% endif %}
+                                    <br>
+                                    <hr>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        <button type="button" id="add-form" class="btn btn-secondary my-1">إضافة ملف آخر</button>
+                        {% endif %}
+
+                    <div class="d-flex justify-content-end ">
+                        <button class="my-2 btn btn-outline-success">تعديل النشاط</button>
+                    </div>
+                </div>
+            </form>
+        {% endif %}
+
+
+    {% else %}
+        <h4>{{message}}</h4>
+    {% endif %}
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        let formContainer = document.getElementById("form-container");
+        let addButton = document.getElementById("add-form");
+        let totalForms = document.getElementById("id_form-TOTAL_FORMS");  
+        let formIndex = parseInt(totalForms.value);  
+        addButton.addEventListener("click", function() {
+            let newForm = formContainer.children[0].cloneNode(true);
+            // البحث عن جميع الحقول داخل النموذج الجديد ومسح القيم السابقة
+            newForm.querySelectorAll("input, select, textarea").forEach(input => {
+                input.value = "";
+                if (input.name) {
+                    input.name = input.name.replace(/-\d+-/, `-${formIndex}-`);
+                    input.id = input.id.replace(/-\d+-/, `-${formIndex}-`);
+                }
+            });
+            // التحقق من زر الحذف وإظهاره في النماذج الجديدة فقط
+            let removeButton = newForm.querySelector(".remove-form");
+            if (!removeButton) {
+                removeButton = document.createElement("button");
+                removeButton.type = "button";
+                removeButton.classList.add("remove-form");
+                removeButton.textContent = "إزالة";
+                newForm.appendChild(removeButton);
+            } else {
+                removeButton.style.display = "block";
+            }
+            formContainer.appendChild(newForm);
+            formIndex++;
+            totalForms.value = formIndex;
+        });
+        formContainer.addEventListener("click", function(e) {
+            if (e.target.classList.contains("remove-form")) {
+                e.target.parentElement.remove();
+                formIndex--;
+                totalForms.value = formIndex;
+            }
+        });
+    });
+</script>
+    
+
+{% endblock content %}

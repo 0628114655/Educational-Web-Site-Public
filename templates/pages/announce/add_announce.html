@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+
+
+{% block content %}
+
+<div class="container">
+
+    <div class="mb-3 text-start">
+        <a href="{% url 'announce' %}" class="text-decoration-none" style="color: inherit; font-size: 0.9rem;">
+          <i class="fas fa-arrow-circle-left me-1"></i> الرجوع للصفحة السابقة
+        </a>
+    </div>
+    <center class="text-info"> <h4> إضافة إعلان </h4></center>
+
+    <form action="" method="post">
+        {% csrf_token %}
+        {{form}}
+        <br>
+        <div class="d-flex justify-content-end">
+
+            <button class="btn btn-outline-success" type="submit">أضف الإعلان</button>
+        </div>
+    </form>
+<br>
+<br>
+    <hr>
+</div>
+
+ 
+{% endblock %}

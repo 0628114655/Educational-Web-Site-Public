@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+    <div class="container ">
+        {% if mark %}
+            <table class="table">
+                    <tr>
+                        <th> المادة:</th>
+                        <th>الفرض رقم 1</th>
+                        <th>الفرض رقم 2</th>
+                        <th>الأنشطة المندمجة</th>
+                    </tr>
+                {% for m in mark %}
+                    <tr>
+                        <td> {{ m.subject.name }} </td>
+                        <td> {% if m.first_mark %} {{m.first_mark}} {% else %} / {% endif %}</td>
+                        <td> {% if m.second_mark %} {{m.second_mark}} {% else %} / {% endif %}</td>
+                        <td> {% if m.third_mark %} {{m.third_mark}} {% else %} / {% endif %}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+        {% else %}
+            <h4>{{message}}</h4>
+        {% endif %}
+    </div>
+{% endblock %}

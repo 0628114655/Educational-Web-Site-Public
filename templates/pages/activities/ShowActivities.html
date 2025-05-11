@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% load static %}
+
+
+
+{% block content %}
+
+<div class="container">
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+    {% if activities %}
+    <div class="show-announce">
+        <div id="slide" class="carousel slide container w-100  mt-5 mb-5" data-ride="carousel">
+                <ol class="carousel-indicators" style="bottom: -30px" >
+                    {% for activity in activities %}
+                        <li data-target="#slide" data-slide-to="{{ forloop.counter0 }}"  class="{% if forloop.first %}active{% endif %}"></li>
+                    {% endfor %}
+                </ol>
+                
+                <div class="carousel-inner"  style="height:  600px; overflow-y:auto">
+                    {% for activity in activities%}
+                        <div class="carousel-item  {% if forloop.first %}active{% endif %}" style="text-align: center;">
+                            <h2 style="font-family: Marhey;">  {{activity.title}}</h2>
+                            <div style="font-family: Marhey; position: relative;" class="announce-content w-100 position-relative" >
+                                {% if 'admin' in request.user.groups.all|join:", " or 'general_surveillance' in request.user.groups.all|join:", " %}
+                                    <div class="announce-action d-flex justify-content-center align-items-center mx-auto">
+                                        <a href="{% url 'Update' activity.id  %}?page=activity" class="btn btn-outline-warning btn-square mx-5" style="text-decoration:none"><i class="fa fa-edit"> تعديل النشاط </i></a> 
+                                        <a href="{% url 'Delete' activity.id  %}?page=activity" onclick="return confirm ('هل أنت متأكد من رغبتك في حذف هذا النشاط؟') " class="btn btn-outline-danger btn-square" style="text-decoration:none"><i class="fa fa-trash"> حذف النشاط </i></a> 
+                                    </div>
+                                {% endif %}
+                                <p>{{activity.content}}</p>
+                            </div>
+                            {% if activity.activity_images %}
+                            <div style="overflow-x: auto; white-space: nowrap; padding: 10px;">
+                                {% for image in activity.activity_images %}
+                                    <div style="display: inline-block; margin-right: 10px;">
+                                        <img src="{{ image.image.url }}" alt="" style="height: 200px; width: auto; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">
+                                    </div>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+                <a href="#slide" class="carousel-control-next" data-slide="next" style="right: -30px;">
+                    <span class="carousel-control-next-icon" aria-hidden="true" ></span>
+                </a>
+                <a href="#slide" class="carousel-control-prev" data-slide="prev" style="left: -30px;">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                </a>
+        </div>
+        <br>
+        
+        {% if 'admin' in request.user.groups.all|join:", " or 'general_surveillance' in request.user.groups.all|join:", " %}
+            <a href="{% url 'add_activity' %}" class="text-info m-4" style="font-size:larger;">إضافة نشاط</a>
+        {% endif  %}
+        <hr>
+    </div>
+    {% else %}
+    <h4>{{message}}</h4>
+    {% if 'admin' in request.user.groups.all|join:", " or 'general_surveillance' in request.user.groups.all|join:", " %}
+    <br><hr>
+    <a href="{% url 'add_activity' %}" class="text-info m-4" style="font-size:larger;">إضافة نشاط</a>
+    {% endif  %}
+{% endif %}  
+<br>  
+<br>  
+
+</div>
+
+{% endblock %}

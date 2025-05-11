@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+ 
+{% block content %}
+<div class="container">
+    <div class="mb-3 text-start">
+        <a href="{{ request.META.HTTP_REFERER }}" class="text-decoration-none" style="color: inherit; font-size: 0.9rem;">
+          <i class="fas fa-arrow-circle-left me-1"></i> الرجوع للصفحة السابقة
+        </a>
+    </div>
+    <center class="text-info mb-4" > <h4>قائمة الامتحانات</h4> </center>
+    {% if message %}
+        <div class="my-5 p-3">
+            <h5>{{message}}</h5>
+        </div>
+    {% endif %}
+    {% for r in result %}
+        <p class="courses-title">
+            <a href="{% url 'exam_correction' r.id %}" class="text-dark">{{r.title}}</a>
+        <hr >
+        </p>
+    {% endfor %}
+</div>
+{% endblock %}
+
+
+    

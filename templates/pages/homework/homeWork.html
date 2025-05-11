@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<div class="container">
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+            {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+    {% if not 'student' in request.user.groups.all|join:";" %}
+        <div class="mb-3 text-start">
+            <a href="{{ request.META.HTTP_REFERER }}" class="text-decoration-none" style="color: inherit; font-size: 0.9rem;">
+            <i class="fas fa-arrow-circle-left me-1"></i> الرجوع للصفحة السابقة
+            </a>
+        </div>
+    {% endif %}
+    {% if home_work %}
+        <table class="table mb-5">
+                {% for h in home_work %}
+                    <thead>
+                        <tr>
+                            <th colspan="2">
+                                <strong>المادة </strong>:
+                                {{h.material.name}}  
+                            </th>
+                        </tr>
+                        <tr>
+                            <th colspan="2">
+                                    <strong>الدرس </strong>:
+                                    {{h.title}}
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="mb-5">
+                        <tr>
+                            <td> 
+                                <strong>الموضوع: </strong>
+                                
+                            </td>
+                            <td>
+                                    {{h.content}}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <strong> موعد التقديم:</strong>
+                               
+                            </td>
+                            <td>
+                                <span class="{% if h.is_two_days %}text-danger{% endif %}">
+                                        {{h.lastDate|date:"d/m/Y"}} (الباقي: {{h.remain}} أيام.)
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <strong>
+                                الملحقات:
+                                </strong>
+                                
+                            </td>
+                            <td>
+
+                                {% if h.files_set.all %}  
+                                    {% for f in h.files_set.all %}  
+                                        <div class="mb-3">{{f.title}} 
+                                            <br>
+                                            {% if f.file.name|slice:"-4:" in ".jpg .png .gif gpeg" %}
+                                                📄 <a href="{{ f.file.url }}" download="">تحميل الصورة </a>
+                                            {% elif f.file.name|slice:"-4:" == ".pdf" %}
+                                                📄 <a href="{{ f.file.url }}" download="">تحميل الملف (PDF)</a>
+                                            {% else %}
+                                                📁 <a href="{{ f.file.url }}" download="">تحميل الملف</a>
+                                            {% endif %}              
+                                            <br>
+                                        </div>
+                                    {% endfor %} 
+                                {% else %}
+                                    <span>لا توجد ملحقات</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    </tbody>
+                    {% if not forloop.last %}
+                        <tr>
+                            <td colspan="2">
+                                <br>
+                            </td>
+                        </tr>
+                    {% endif %}
+                    {% endfor %}
+            </table>
+    {% else %}
+    <h4 class="m-4 p-2">{{message}}</h4>
+    {% endif %}
+</div>
+{% endblock content %}

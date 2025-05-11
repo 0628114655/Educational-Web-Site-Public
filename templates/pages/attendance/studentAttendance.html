@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container ">
+  <div class="mb-3 text-start">
+    <a href="{% url 'ClassStudents' student.sections.id %}" class="text-decoration-none" style="color: inherit; font-size: 0.9rem;">
+      <i class="fas fa-arrow-circle-left me-1"></i> الرجوع للصفحة السابقة
+    </a>
+  </div>
+  <center class="">
+  <h4>بطاقة التلميذ</h4>
+</center>
+  <div class="row p-4">
+    <!-- السايدبار الثابت -->
+    <div class="col-12 col-md-3 px-4 px-md-0 col-lg-2 p-2 border-end">
+      <div class="sticky-top pt-3">
+        
+        <h5 class="mt-4">المواظبة:</h5>
+        <nav class="nav flex-column my-3  py-1">
+
+          <a style="color:black; font-size: large;" class="nav-link py-2 mb-2 rounded hover-bg" href="{% url 'studentAbsence' student.id %}">
+            <i class="fas fa-user-times me-2"></i> الغياب
+          </a>
+          <a  style="color:black; font-size: large" class="nav-link py-2 mb-2 rounded hover-bg" href="{% url 'add_reports' student.id %}">
+            <i class="fas fa-file-alt me-2"></i> التقارير
+          </a>
+
+        </nav>
+      </div>
+    </div>
+
+    <!-- المحتوى الرئيسي -->
+    <div class="col-12 col-md-9 col-lg-10 p-4">
+      <div class="card w-100 shadow">
+        <div class="card-body">
+          <h5 class="card-title">{{user.firstname}} {{user.lastname}}</h5>
+        </div>
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item">
+            <i class="fas fa-id-card"></i>
+            الاسم الكامل: {{ student.first_name }} {{ student.last_name }}
+          </li>
+          <li class="list-group-item">
+            <i class="fas fa-chalkboard"></i>
+            القسم: {{ student.sections }}
+          </li>
+          <li class="list-group-item">
+            <i class="fas fa-id-badge"></i>
+            رمز مسار: {{ student.massar_num }}
+          </li>
+          <li class="list-group-item">
+            <i class="fas fa-phone"></i>
+            رقم هاتف ولي الأمر: {% if student.number_phone %} {{ student.number_phone }} {% else %} غير موجود {% endif %}
+          </li>
+          <li class="list-group-item">
+            <i class="fas fa-envelope"></i>
+            البريد الإلكتروني لولي الأمر: 
+            {% if student.parentEmail %}{{ student.parentEmail }}{% else %}بدون{% endif %}
+          </li>
+        </ul>
+        
+        
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<style>
+
+  .hover-bg:hover {
+    background-color: rgba(13, 110, 253, 0.1);
+    color: #0d6efd !important;
+  }
+  .sticky-top {
+    top: 20px; /* تعديل حسب الحاجة */
+  }
+</style>
+{% endblock %}

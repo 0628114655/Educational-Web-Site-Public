@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+    <div class="container ">
+        <div class="mb-3 text-start mr-5 p-2">
+            <a href="{{ request.META.HTTP_REFERER }}" class="text-decoration-none" style="color: inherit; font-size: 0.9rem;">
+              <i class="fas fa-arrow-circle-left me-1"></i> الرجوع للصفحة السابقة
+            </a>
+        </div>
+        <div class="row p-3 m-4">
+            <div class="col col-8">
+                <p class="text-center text-dark " style="font-size:x-large; font-weight:bolder">{{course.title}}</p>
+                <center>
+                <small>المادة: {{ course.material }} </small>
+                </center>
+                (
+                <small>القسم:
+                {% for s in course.section.all %}
+                     {{ s.name }}/
+                    {% endfor %}
+                </small>
+                )
+                <p class="my-2">{{course.introduction}}</p>
+                <p>{{course.subject}}</p>
+                <p class="my-2">{{course.conclusion}}</p>
+            </div>
+            <div class="col col-4 ">
+                {% for image in images %}
+                    <div class="my-3">
+                        {% if image.image %}
+                        <div class="">
+                            <p>
+                            {{image.title}} (
+                            <a href="{{image.imgURL}}" class="text-dark" download=""><small>نزل الصورة </small></a>)
+                            </p>
+                        </div>
+                        <div class="" ><img src="{{image.imgURL}}" class="my-1" style="width: 300px; height:auto" alt=""></div>
+                        {% else %}
+                        <p class="text-muted">لا توجد صورة متاحة</p>
+                        {% endif %}                    
+                    </div>
+                {% endfor %}
+                
+
+            </div>
+        </div>
+
+   
+        {% if 'admin' in request.user.groups.all|join:", " or 'general_surveillance' in request.user.groups.all|join:", " or 'teacher' in request.user.groups.all|join:',' %}
+        <a href="{% url 'Update' course.id %}?page=course" class="text-info m-4" style="font-size:larger;">تعديل الدرس</a>
+        <a href="{% url 'Delete' course.id %}?page=course" onclick="return confirm ('هل أنت متأكد من الحذف؟')" class="text-info m-4" style="font-size:larger;">حذف الدرس</a>
+        {% endif  %}
+    </div>
+{% endblock %}

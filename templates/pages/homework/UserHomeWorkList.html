@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+ 
+{% block content %}
+
+<div class="container ">
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+            {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+    
+    <center class="text-info" style="font-size: x-large;">الواجبات الدراسية التي نشرها المستخدم</center>
+    {% if homework %}
+        {% for h in homework %}
+            <br>
+            <h5><a style="color: inherit;" href="{% url 'HomeWorkView' h.id %}">{{h.title}}</a></h5>
+            <h6>
+               المادة: {{h.material.name}}
+            </h6>
+            <h6>
+               القسم:
+               {% for s in h.section.all %}
+               {{s.name}}
+               {% endfor %}
+
+            </h6>
+            <h6>
+               تاريخ التسليم:{{h.lastDate|date:"d/m/Y"}}
+
+
+            </h6>
+    
+            <br>
+            <hr>
+        {% endfor %}
+    {% else %}
+        <center>
+            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        </center>
+    {% endif %}
+
+
+    {% if 'admin' in request.user.groups.all|join:", " or 'teacher' in request.user.groups.all|join:"," %}
+        <a href="{% url 'homeWork' %}" class="text-info m-4" style="font-size:larger">لإضافة واجب منزلي اضغط هنا </a>
+    {% endif  %}
+
+</div>
+
+
+{% endblock %}
+
+
+    

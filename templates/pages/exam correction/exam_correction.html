@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+    <div class="container ">
+        <h5 class="mx-5 mt-3">{{result.title}}</h5>
+        <div class="mx-5">
+            <small class="mx-2">مادة: {{result.material}}</small>
+            <small class="">القسم:(
+                {% for s in result.section.all %}
+                {{s.name}}
+                {% endfor %}
+                )
+            </small>
+            <p>
+                <small class="mx-2" >تاريخ إنجاز الفرض: {{result.date|date:'d/m/Y'}}</small>
+            </p>
+        </div>                
+        <div class="row p-3 m-4">
+            <div class="col col-8">
+                <p class="my-2">{{result.content|linebreaksbr}}</p>
+            </div>
+            <div class="col col-4">
+            </div>
+        </div>
+    </div>
+{% endblock %}

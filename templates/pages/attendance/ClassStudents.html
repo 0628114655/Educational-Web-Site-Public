@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<div class="container mt-4">
+    {% if message %}
+        <h4>{{message}}</h4>
+    {% else %}
+    <div class="mb-3 text-start">
+        <a href="{% url 'classes' %}" class="text-decoration-none" style="color: inherit; font-size: 0.9rem;">
+          <i class="fas fa-arrow-circle-left me-1"></i> الرجوع للصفحة السابقة
+        </a>
+    </div>
+    <center class="text-info mb-4"> <h4 my-2> لائحة تلاميذ القسم: {{section.name}} </h4> </center>
+    <table  class="table">
+        <tr>
+            <th class="m-4">
+                    رقم مسار
+            </th>
+            <th class="m-4">
+                الاسم الكامل
+            </th>
+            <th class="m-4">
+                    القسم
+            </th>
+            <th class="m-4">
+                    رقم هاتف ولي الأمر
+            </th>
+        </tr>
+        {% for s in students %}
+        <tr>
+            <td class="">{{s.massar_num}}</td>
+            <td class=""> <a style="color: inherit;" href="{% url 'StudentAttendance' s.id %}"> {{s.first_name}} {{ s.last_name}} </a> </td>
+            <td class="">{{s.sections}}</td>
+            <td class="">{{s.number_phone}}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% endif %}
+            
+
+</div>
+{% endblock %}

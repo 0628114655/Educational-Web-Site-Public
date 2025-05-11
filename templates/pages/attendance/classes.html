@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<div class="container mt-4">
+                <h2 class="text-center my-4">البنية التربوية للمؤسسة</h2>
+                <div class="row">
+                    {% for c in classes %}
+                    <div class="col-md-4 mb-3">
+                        <div class="card shadow">
+                            <div class="card-body text-center">
+                                <h5 class="card-title">{{ c }}</h5>
+                                <a href="{% url 'ClassStudents' c.id %}" class="btn btn-info">عرض التلاميذ</a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+</div>
+{% endblock %}

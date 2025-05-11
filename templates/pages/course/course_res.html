@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+ 
+{% block content %}
+
+<div class="mb-3 text-start mr-5 p-2">
+    <a href="{{ request.META.HTTP_REFERER }}" class="text-decoration-none" style="color: inherit; font-size: 0.9rem;">
+      <i class="fas fa-arrow-circle-left me-1"></i> الرجوع للصفحة السابقة
+    </a>
+</div>
+<div class="container w-50">
+    
+    <form action="{% url 'search' %}" method="Get">
+        <div class="form-group">
+            <div class="input-group">
+                <input type="search" placeholder="ابحث عن الدرس" required name="query" class="form-control" dir="rtl">
+                <button class="btn btn-light">بحث</button>
+            </div>
+        </div>
+    </form>
+</div>
+{% if 'admin' in request.user.groups.all|join:", " or 'general_surveillance' in request.user.groups.all|join:"," or 'teacher' in request.user.groups.all|join:"," %}
+    <a href="{% url 'add_course' %}" class="text-info m-4 mr-5" style="font-size: larger;">إضافة درس</a>
+{% endif  %}
+<hr>
+
+
+{% endblock %}
+
+
+    

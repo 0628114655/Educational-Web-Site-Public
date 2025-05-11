@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+ 
+{% block content %}
+
+<div class="container ">
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+            {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+    <center class="text-info" style="font-size: x-large;">  الدروس التي نشرها المستخدم</center>
+    {% if course %}
+        {% for c in course %}
+            <br>
+            <h5><a class="mx-3 text-info" href="{% url 'course' c.id %}">{{c.title}}</a></h5>
+            <h6>
+               المادة: {{c.material.name}}
+            </h6>
+            <h6>
+               القسم:
+               {% for s in c.section.all %}
+                    {{s.name}} /
+               {% endfor %}
+
+            </h6>    
+            <br>
+            <hr>
+        {% endfor %}
+    {% else %}
+        <center>
+            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        </center>
+    {% endif %}
+
+
+    {% if 'admin' in request.user.groups.all|join:", " or 'teacher' in request.user.groups.all|join:"," or 'general_surveillance' in request.user.groups.all|join:"," %}
+        <a href="{% url 'add_course' %}" class="text-info m-4" style="font-size:larger">لإضافة درس اضغط هنا </a>
+        <a href="{% url 'course_res' %}" class="text-info m-4" style="font-size:larger"> البحث عن درس </a>
+    {% endif  %}
+
+</div>
+
+
+{% endblock %}
+
+
+    

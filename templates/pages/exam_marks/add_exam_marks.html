@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% load static %}
+
+
+{% block content %}
+
+<div class="container">
+    
+    <center class="text-danger">هذه صفحة لإضافة النقاط </center>
+
+    <form action="" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{form}}
+        <div class="d-flex justify-content-end">
+            <button class="btn btn-outline-success my-2" type="submit">أضف النقطة </button>
+        </div>
+    </form>
+<br>
+<br>
+    <hr>
+</div>
+
+
+{% endblock %}

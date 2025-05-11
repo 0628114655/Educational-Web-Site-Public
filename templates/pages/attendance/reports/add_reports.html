@@ -1,0 +1,165 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid">
+      {% if message %}
+    <h4>
+      {{message}}
+    </h4> 
+      {% else %}
+      {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+            {{ message }}
+            </div>
+        {% endfor %}
+      {% endif %}
+      <!-- 1. شريط العنوان والأدوات -->
+      <div class="mb-3 text-start">
+        <a href="{% url 'StudentAttendance' student.id %}" class="text-decoration-none" style="color: inherit; font-size: 0.9rem;">
+          <i class="fas fa-arrow-circle-left me-1"></i> الرجوع للصفحة السابقة
+        </a>
+      </div>
+      <div class="row mb-4">
+        <div class="col-12">
+          <div class="d-flex justify-content-between align-items-center p-3 bg-light border rounded">
+              <h4 class="mb-0">
+                <i class="fas fa-calendar-day text-primary me-2"></i> التقارير   
+              </h4>
+              <div>
+                <span class="badge  text-dark me-2">تاريخ اليوم: {% now "Y-m-d" %}</span>
+                <button class="btn btn-sm btn-primary" onclick="window.print()">
+                  <i class="fas fa-print me-1"></i> طباعة
+                </button>
+              </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. فلترة البيانات -->
+      <form action="{% url 'add_reports' student.id %}" method="post">
+        {% csrf_token %}
+          <div class="row mb-3 d-flex justify-content-between">
+            <div class="col-4  mb-2">
+                <select name="material" class="form-select form-control" id="">
+                      {% for m in all_materials %}
+                      <option value="{{m.id}}" >{{m.name}}</option>
+                      {% endfor %}
+                </select>
+            </div>
+            
+            <div class="col-md-4 mb-2">
+              <input name="date" type="date" class="form-control" value="{% now 'Y-m-d' %}">
+            </div>
+
+          </div>
+
+          <!-- 3. جدول التقارير  -->
+          <div class="row">
+            <div class="col-12">
+              <div class="card shadow-sm">
+                <div class="card-body p-0">
+                  <div style="overflow-x: auto; width: 100%;">                
+                    <table class="table table-hover table-bordered mb-0" style="width: auto; min-width: 100%;">
+                      <thead class="table-light">
+                        <tr>
+                          <th style="text-align: center; font-size: large" width="15%">اسم التلميذ</th>
+                          <th style="text-align: center;" width="10%">رقم مسار</th>
+                          <th style="text-align: center; font-size: large;" width="40%">موضوع التقرير</th>
+                          <th style="text-align: center; font-size: large" width="20%"> الإجراء الواجب اتخاذه</th>
+                          <th style="text-align: center; font-size: large" width="15%">خيارات</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td style="text-align: end;" width="15%">{{student.first_name}} {{student.last_name}}</td>
+                          <td width="10%">{{student.massar_num}}</td>
+
+                          <td width="40%" style="white-space: nowrap;">
+                            <textarea type="text"  required class="form-control form-control-sm" name="report_content" placeholder="موضوع التقرير"></textarea>
+                          </td>
+                          <td width="20%" style="white-space: nowrap;">
+                            <textarea type="text"  required class="form-control form-control-sm" name="instructions" ></textarea>
+                          </td>
+                          <td style="white-space: nowrap;" width="15%">
+                            <button type="submit" class="btn btn-sm btn-success me-1">
+                              <i class="fas fa-check"></i> حفظ
+                            </button>
+                            <a href="{% url 'studentTotalreports' student.id %}" id="history" style="text-decoration: none;"  class="btn btn-sm btn-outline-secondary ">
+                              <i class="fas fa-history"></i>  السجل 
+                            </a>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+      </form>
+      <div class="table-responsive border" style="max-height: 600px; overflow-y: auto;">
+        <h5 class="mx-3 my-2">سجل التقارير:</h5>
+        {% if reports %}
+
+        <table class="table table-hover table-bordered my-3" style="table-layout: fixed; width: 100%;">
+          <thead class="table-light justify-content-center" style="position: sticky; top: 0; z-index: 1;">
+            <tr  >
+              <th style="width: 25%; text-align:center; font-size: large">المادة</th>
+              <th style="width: 25%; text-align:center; font-size: large">التاريخ</th>
+              <th style="width: 15%; text-align:center; font-size: large">موضوع التقرير</th>
+              <th style="width: 40%; text-align:center; font-size: large">الإجراء المتخذ  </th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for r in reports %}
+              <tr >
+                <td style="word-wrap: break-word;text-align:center">{{r.material}} </td>
+                <td style="white-space: nowrap;text-align:center">{{r.date|date:'Y-m-d'}}</td>
+                
+                <td style="text-align:center" class="">{{r.content}}</td>
+
+                <td style="text-align:center; word-wrap: break-word; max-width: 0; overflow: hidden; text-overflow: ellipsis;" title="{{a.notes}}">
+                  {{r.instructions}}
+                  
+                  <br>
+                  <a href="{% url 'Delete' r.id %}?page=reports" onclick="return confirm ('هل أنت متأكد من الحذف؟')"  class="btn btn-outline-danger my-2 mx-auto" style="height: 30px; width: 55px; text-align: center; font-size:small;display: flex; justify-content: center; align-items: center;" onclick="return confirm('هل أنت متأكد من الحذف؟');">    حذف  </a>
+                </td>
+              </tr>
+          {% endfor %}
+            </tbody>
+          </table>
+
+          {% else %}
+            <center>
+              <p class="m-3">
+              لا يوجد أي تقرير لعرضه
+              </p
+            </center>
+          {% endif %}
+      </div>
+    
+  {% endif %}    
+</div>
+
+
+
+
+
+
+<style>
+  /* تنسيقات مخصصة */
+  /* .table thead th {
+    white-space:nowrap
+  } */
+  .card-header {
+    font-weight: 600;
+  }
+  .border-4 {
+    border-width: 4px !important;
+  }
+  body{
+  }
+</style>
+{% endblock %}

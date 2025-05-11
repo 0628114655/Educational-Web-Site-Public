@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+
+
+
+{% block content %}
+
+<div class="container">
+    <div class="mb-3 text-start">
+        <a href="{% url 'ShowActivities' %}" class="text-decoration-none" style="color: inherit; font-size: 0.9rem;">
+          <i class="fas fa-arrow-circle-left me-1"></i> الرجوع للصفحة السابقة
+        </a>
+    </div>
+    <center class="text-info"> <h4> إضافة نشاط تربوي </h4></center>
+
+    <form action="" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{form}}
+        <br>
+        <h3>إضافة صور للنشاط</h3>
+        {{ ImageFormSet.management_form }} 
+        <div id="form-container"> 
+        {% for image_form in ImageFormSet %}
+            <div class="image-upload ">
+                {{ image_form.as_p }}
+                <hr>
+                {% if not forloop.first %}
+                    <button type="button" class="remove-form">إزالة</button>
+                    <br>
+                {% endif %}
+            </div>
+        {% endfor %}
+        </div>
+        <button type="button" id="add-form" class="btn btn-secondary my-1">إضافة صورة أخرى</button>
+
+        
+        <div class="d-flex justify-content-end">
+            <button class="btn btn-outline-success" type="submit">أضف النشاط</button>
+        </div>
+    </form>
+    <hr>
+</div>
+
+ 
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        let formContainer = document.getElementById("form-container");
+        let addButton = document.getElementById("add-form");
+        let totalForms = document.getElementById("id_form-TOTAL_FORMS");  
+        let formIndex = parseInt(totalForms.value);  
+        addButton.addEventListener("click", function() {
+            let newForm = formContainer.children[0].cloneNode(true);
+            // البحث عن جميع الحقول داخل النموذج الجديد ومسح القيم السابقة
+            newForm.querySelectorAll("input, select, textarea").forEach(input => {
+                input.value = "";
+                if (input.name) {
+                    input.name = input.name.replace(/-\d+-/, `-${formIndex}-`);
+                    input.id = input.id.replace(/-\d+-/, `-${formIndex}-`);
+                }
+            });
+            // التحقق من زر الحذف وإظهاره في النماذج الجديدة فقط
+            let removeButton = newForm.querySelector(".remove-form");
+            if (!removeButton) {
+                removeButton = document.createElement("button");
+                removeButton.type = "button";
+                removeButton.classList.add("remove-form");
+                removeButton.textContent = "إزالة";
+                newForm.appendChild(removeButton);
+            } else {
+                removeButton.style.display = "block";
+            }
+            formContainer.appendChild(newForm);
+            formIndex++;
+            totalForms.value = formIndex;
+        });
+        formContainer.addEventListener("click", function(e) {
+            if (e.target.classList.contains("remove-form")) {
+                e.target.parentElement.remove();
+                formIndex--;
+                totalForms.value = formIndex;
+            }
+        });
+    });
+</script>
+ 
+{% endblock %}

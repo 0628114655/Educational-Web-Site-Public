@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+<div class="container">
+    
+    <form action="" method="post">
+        {% csrf_token %}
+        {{form}}
+        <button type="submit" class="btn btn-outline-success shadow m-2" style="float: left;">تسجيل</button>
+    </form>
+
+</div>
+
+{% endblock content %}

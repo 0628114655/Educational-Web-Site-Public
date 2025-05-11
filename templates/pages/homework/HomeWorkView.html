@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+ 
+{% block content %}
+
+<div class="container ">
+    <div class="mb-3 text-start">
+        <a href="{{ request.META.HTTP_REFERER }}" class="text-decoration-none" style="color: inherit; font-size: 0.9rem;">
+          <i class="fas fa-arrow-circle-left me-1"></i> الرجوع للصفحة السابقة
+        </a>
+    </div>
+    {% if homeWork %}
+        <center class="text-info mb-4 pb-2"><h4>الواجب الدراسي</h4></center>
+        <table class="table mb-5">
+                    <thead>
+                        <tr>
+                            <th colspan="2">
+                                <strong>المادة </strong>:
+                                {{homeWork.material.name}}  
+                            </th>
+                        </tr>
+                        <tr>
+                            <th colspan="2">
+                                    <strong>الدرس </strong>:
+                                    {{homeWork.title}}
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="mb-5">
+                        <tr>
+                            <td> 
+                                <strong>الموضوع: </strong>
+                                
+                            </td>
+                            <td>
+                                    {{homeWork.content}}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <strong> موعد التقديم:</strong>
+                            
+                            </td>
+                            <td>
+                                <span class="{% if homeWork.is_two_days %}text-danger{% endif %}">
+                                        {{homeWork.lastDate|date:"d/m/Y"}} (الباقي: {{homeWork.remain}} أيام.)
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <strong>
+                                الملحقات:
+                                </strong>
+                                
+                            </td>
+                            <td>
+
+                                {% if homeWork.files_set.all %}  
+                                    {% for f in homeWork.files_set.all %}
+                                    {% if f.file %}
+                                        <div class="mb-3">{{f.title}} 
+                                            <br>
+                                            {% if f.file.name|slice:"-4:" in ".jpg .png .gif gpeg" %}
+                                                📄 <a href="{{ f.file.url }}" download="">تحميل الصورة </a>
+                                            {% elif f.file.name|slice:"-4:" == ".pdf" %}
+                                                📄 <a href="{{ f.file.url }}" download="">تحميل الملف (PDF)</a>
+                                            {% else %}
+                                                📁 <a href="{{ f.file.url }}" download="">تحميل الملف</a>
+                                            {% endif %}              
+                                            <br>
+                                        </div>
+                                    {% else %}
+                                        <p>هذا الملحق لا يتضمن ملفات</p>
+                                    {% endif %}
+                                    {% endfor %} 
+                                {% else %}
+                                    <span>لا توجد ملحقات</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    </tbody>
+                    {% if not forloop.last %}
+                        <tr>
+                            <td colspan="2">
+                                <br>
+                            </td>
+                        </tr>
+                    {% endif %}
+            </table>
+    {% else %}
+        <center>
+            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        </center>
+    {% endif %}
+
+    {% if 'admin' in request.user.groups.all|join:", " or 'teacher' in request.user.groups.all|join:"," %}
+        <a href="{% url 'Update' homeWork.id %}?page=homework" class="text-info m-4" style="font-size:larger">تعديل الواجب الدراسي</a>
+        <a href="{% url 'Delete' homeWork.id %}?page=homework" onclick="return confirm ('هل أنت متأكد من الحذف؟')" class="text-info m-4" style="font-size:larger">حذف الواجب الدراسي</a>
+    {% endif  %}
+
+</div>
+
+
+{% endblock %}
+
+
+    

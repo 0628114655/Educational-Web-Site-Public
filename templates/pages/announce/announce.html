@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+
+
+{% block content %}
+
+<div class="container">
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+    {% if announces %}
+    <div class="show-announce">
+        <div id="slide" class="carousel slide container w-75  mt-5 mb-5" data-ride="carousel">
+                <ol class="carousel-indicators" style="bottom: -30px" >
+                    {% for announce in announces %}
+                        <li data-target="#slide" data-slide-to="{{ forloop.counter0 }}"  class="{% if forloop.first %}active{% endif %}"></li>
+                    {% endfor %}
+                </ol>
+                
+                <div class="carousel-inner"  style="height:  200px;">
+                    {% for announce in announces%}
+                        <div class="carousel-item  {% if forloop.first %}active{% endif %}" style="text-align: center;">
+                            <h2 style="font-family: Marhey;">  {{announce.title}}</h2>
+                            <div style="font-family: Marhey;" class="announce-content w-100">
+                                {% if 'admin' in request.user.groups.all|join:", " or 'general_surveillance' in request.user.groups.all|join:", " %}
+                                    <div class="announce-action d-flex justify-content-center align-items-center mx-auto">
+                                        <a href="{% url 'Update' announce.id  %}?page=announce" class="btn btn-outline-warning btn-square mx-5" style="text-decoration:none"><i class="fa fa-edit"> تعديل الإعلان </i></a> 
+                                        <a href="{% url 'Delete' announce.id  %}?page=announce" onclick="return confirm ('هل أنت متأكد من الحذف؟')" class="btn btn-outline-danger btn-square" style="text-decoration:none"><i class="fa fa-trash"> حذف الإعلان </i></a> 
+                                    </div>
+                                {% endif %}
+                                <p>{{announce.content}}</p>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+                
+                <a href="#slide" class="carousel-control-next" data-slide="next" style="right: -30px;">
+                    <span class="carousel-control-next-icon" aria-hidden="true" ></span>
+                </a>
+                <a href="#slide" class="carousel-control-prev" data-slide="prev" style="left: -30px;">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                </a>
+        </div>
+        <br>
+        
+        {% if 'admin' in request.user.groups.all|join:", " or 'general_surveillance' in request.user.groups.all|join:", " %}
+            <a href="{% url 'add_announce' %}" class="text-info m-4" style="font-size:larger;">إضافة إعلان</a>
+        {% endif  %}
+        <hr>
+    </div>
+    {% else %}
+    <h4 class="m-4 p-2">{{message}}</h4>
+    {% if 'admin' in request.user.groups.all|join:", " or 'general_surveillance' in request.user.groups.all|join:", " %}
+    <br><hr>
+    <a href="{% url 'add_announce' %}" class="text-info m-4" style="font-size:larger;">إضافة إعلان</a>
+    {% endif  %}
+{% endif %}  
+<br>  
+<br>  
+
+</div>
+
+{% endblock %}

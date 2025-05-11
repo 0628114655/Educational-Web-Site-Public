@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+
+<div class="container mt-4" >
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+            {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+    <div class="row justify-content-center">
+        <div class=" col-12 col-md-8">
+            {% for paragraph in paragraphs %}
+                <div class="problematic-text" >
+                    {{ paragraph.text }}
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<hr>
+
+{% endblock %}

@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load custom_filter %}
+{% block content %}
+
+<div class="container-fluid my-5">
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+            {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="mb-3 text-start">
+        <a href="{% url 'add_reports' student.id %}" class="text-decoration-none" style="color: inherit; font-size: 0.9rem;">
+          <i class="fas fa-arrow-circle-left me-1"></i> الرجوع للصفحة السابقة
+        </a>
+      </div>
+      
+      <div class="mb-4  text-center text-info">
+        <h4>
+        السجل العام للتقارير (التلميذ(ة): {{ student.first_name }} {{ student.last_name }})
+        </h4>
+      </div>
+      
+      <div class="text-center mb-3">
+        <button class="btn btn-sm btn-primary" onclick="window.print()">
+          <i class="fas fa-print me-1"></i> طباعة
+        </button>
+      </div>
+    {% for year, reports in grouped_reports.items %}
+
+        <div class="mb-3 d-inline">
+            <p class="d-inline-flex gap-1">
+                <a class="btn btn-outline-primary" data-toggle="collapse" href="#collapseYear{{ year }}" role="button" aria-expanded="false" aria-controls="collapseYear{{ year }}">
+                    السنة: {{ year }}
+                    (
+                    <small> مجموع التقارير خلال السنة {% with yearCount|get_item:year as total %} {{total}}  {% endwith %} </small>
+                    )
+                </a>
+            </p>
+            <div class="collapse" id="collapseYear{{ year }}">
+                <div class="card card-body">
+                    {% if reports %}
+                        {% for month, report in reports.items %}
+
+                            <p class="d-inline-flex gap-1">
+                                <a class="btn btn-outline-success my-2" data-toggle="collapse" href="#collapseMonth{{ year }}{{ month }}" role="button" aria-expanded="false" aria-controls="collapseMonth{{ year }}{{ month }}">
+                                    الشهر: {{ month }}
+                                    (
+                                    <span> مجموع الغياب خلال الشهر {% with monthCount|get_item:year|get_item:month as total %} {{total}} {% endwith %}  </span>
+                                    )
+
+                                </a>
+                            </p>
+                            <div class="collapse" id="collapseMonth{{ year }}{{ month }}">
+                                <div class="card card-body">
+                                    {% for r in report %}
+                                        <div class="card my-3 shadow-sm">
+                                            <div class="card-header ">
+                                                <strong>تقرير رقم: {{ r.counter }}</strong>
+                                            </div>
+                                            
+                                            <div class="card-body  ">
+                                                <p><strong>الإجراء المتخذ:</strong> {{ r.instructions }}</p>
+                                                <p><strong>المادة:</strong> {{ r.material }}</p>
+                                                <p><strong>التاريخ:</strong> {{ r.date|date:"Y-m-d" }}</p>
+                                                <p><strong>موضوع التقرير:</strong> {{ r.content }}</p>
+                                                <div class="d-flex justify-content-end">
+                                                    <a href="{% url 'Delete' r.id %}?page=reports"  class="btn btn-outline-danger my-2 " onclick="return confirm('هل أنت متأكد من الحذف؟');">   حذف التقرير </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p>لا توجد تقارير مسجلة في هذه السنة.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        {% empty %}
+        <p class="text-center text-muted">لا توجد بيانات تقارير متاحة.</p>
+        {% endfor %}
+
+</div>
+
+{% endblock %}
