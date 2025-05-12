@@ -214,3 +214,6 @@ class Absence(models.Model):
     class Meta:
         ordering = ['-dateTime']
 
+class Solution:
+    def subsets(self, nums:list[int])-> list[list[int]]:
+        n = len(nums)
