@@ -48,7 +48,7 @@
         {% if 'admin' in request.user.groups.all|join:", " or 'general_surveillance' in request.user.groups.all|join:", " %}
             <a href="{% url 'add_announce' %}" class="text-info m-4" style="font-size:larger;">إضافة إعلان</a>
         {% endif  %}
-        <hr>
+
     </div>
     {% else %}
     <h4 class="m-4 p-2">{{message}}</h4>
@@ -57,8 +57,7 @@
     <a href="{% url 'add_announce' %}" class="text-info m-4" style="font-size:larger;">إضافة إعلان</a>
     {% endif  %}
 {% endif %}  
-<br>  
-<br>  
+
 
 </div>
 

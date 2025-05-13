@@ -1,0 +1,39 @@
+ {% load static %}
+ <nav class="navbar navbar-expand-lg navbar-light" dir="rtl">
+        <a href="/" class="navbar-brand text-center d-flex align-items-center">
+            <img src="{% static 'photos/aim.jpg' %}" alt="شعار الثانوية الإعدادية أنس بن مالك ">
+            <h3>الثانوية الإعدادية أنس بن مالك </h3>
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarContent">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div id="navbarContent" class="collapse navbar-collapse justify-content-center">
+            <ul class="navbar-nav" style="border-radius:2px; color:#f8f9fa">
+
+                <!-- الصفحات المشتركة -->
+                <li class="nav-item {% if request.path == '/' %} active {% endif %} "><a href="/" class="nav-link">الرئيسية</a></li>
+                <li class="nav-item {% if request.resolver_match.url_name == 'announce' or request.resolver_match.url_name == 'add_announce' %} active {% endif %}"><a href="{% url 'announce' %}" class="nav-link">إعلانات</a></li>
+                <li class="nav-item {% if request.resolver_match.url_name == 'ShowActivities' or request.resolver_match.url_name == 'add_activity' %} active {% endif %}"><a href="{% url 'ShowActivities' %}" class="nav-link">أنشطة</a></li>
+                <li class="nav-item {% if request.resolver_match.url_name == 'course_res' or request.resolver_match.url_name == 'course' or request.resolver_match.url_name == 'search' or request.resolver_match.url_name == 'add_course' or request.resolver_match.url_name == 'UserCourseList' %} active {% endif %}  "><a href=" {% if 'admin' in request.user.groups.all|join:',' or 'teacher' in request.user.groups.all|join:',' or 'general_surveillance' in request.user.groups.all|join:','  %} {% url 'UserCourseList' %} {% else %} {% url 'course_res' %} {% endif %} " class="nav-link">دروس</a></li>
+                <li class="nav-item {% if request.resolver_match.url_name == 'exams' or request.resolver_match.url_name == 'exam_marks' or request.resolver_match.url_name == 'exam_correction'  or request.resolver_match.url_name == 'exam_research'  or request.resolver_match.url_name == 'exam_search_result' %} active {% endif %}"><a href="{% url 'exams' %}" class="nav-link">امتحانات</a></li>
+                
+                <!--  الصفحات الخاصة بالحارس العام والأدمن -->
+                {% if 'admin' in request.user.groups.all|join:", " or 'general_surveillance' in request.user.groups.all|join:", " %}
+                <li class="nav-item {% if request.path == '/classes/' or request.path == '/ClassStudents/' or request.resolver_match.url_name == 'studentTotalAbsence' or request.resolver_match.url_name == 'studentAbsence' or request.resolver_match.url_name == 'StudentAttendance' or request.resolver_match.url_name == 'ClassStudents' or request.resolver_match.url_name == 'add_reports' or request.resolver_match.url_name == 'studentTotalreports' %} active {% endif %}"><a href="{% url 'classes' %}" class="nav-link seasonsDropdown"> المواظبة </a></li>
+                {% endif %}
+
+                <!-- الصفحات الخاصة بالأدمن والأساتذة والتلاميذ -->
+                {% if 'admin' in request.user.groups.all|join:", " or 'teacher' in request.user.groups.all|join:", "  or 'student' in request.user.groups.all|join:", " %}
+                <li class="nav-item {% if request.resolver_match.url_name == 'homeWork' or request.resolver_match.url_name == 'UserHomeWorkList' or request.resolver_match.url_name == 'HomeWorkView' %} active {% endif %}"><a href=" {% if 'student' in request.user.groups.all|join:',' %} {% url 'homeWork' %} {% else %} {% url 'UserHomeWorkList' %} {% endif %} " class="nav-link seasonsDropdown"> الواجبات الدراسية</a></li>
+                {% endif %}
+
+                <!-- الصفحات المشتركة -->
+                <li class="nav-item {% if request.path == '/signup/' %} active {% endif %}"><a href="{% url 'signup' %}" class="nav-link sign">الاشتراك </a></li>
+                <li class="nav-item {% if request.path == '/signin/' %} active {% endif %}"><a href="{% url 'signin' %}" class="nav-link sign"> تسجيل الدخول </a></li>
+                {% url 'password_change' as p %}
+                {% url 'password_change_done' as d %}
+                <li class="nav-item mx-2 {% if request.path == '/UserInfo/' %} active {% endif %}"><a href="{% url 'UserInfo' %}" class="nav-link user" >{% if request.path != p and request.path != d %} <i class="fas fa-user "></i>  مرحبا  {{user_info.firstname}} {% endif %}</a></li>
+                <li class="nav-item "><a href="{% url 'signout' %}" class="nav-link out"> تسجيل الخروج  </a></li>
+            </ul>
+        </div>
+    </nav>

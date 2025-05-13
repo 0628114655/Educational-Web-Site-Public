@@ -88,7 +88,7 @@ class Activities(models.Model):
         return f'نشاط حول موضوع: {self.title} بتاريخ {self.dateTime}'
 
 class Image(models.Model):
-    title = models.CharField(max_length = 100, default= 'صورة')
+    title = models.CharField(max_length = 100, default= 'صورة', null=True, blank=True)
     course = models.ForeignKey(Course , on_delete = models.CASCADE, null = True, blank=True , default=None)
     activity = models.ForeignKey(Activities, on_delete= models.CASCADE, null = True, blank = True,  default=None)
     image = models.ImageField(null=True, blank=True)
@@ -214,6 +214,3 @@ class Absence(models.Model):
     class Meta:
         ordering = ['-dateTime']
 
-class Solution:
-    def subsets(self, nums:list[int])-> list[list[int]]:
-        n = len(nums)

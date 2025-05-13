@@ -32,34 +32,29 @@ def home (request):
 @allowed_user(allowed_roles = ['admin', 'general_surveillance'])
 def add_activity (request): 
     ImageFormSet = modelformset_factory(Image, form=ImageForm, extra=1) 
+    form = Add_activity(request.POST or None)
+    formset = ImageFormSet(request.POST or None, request.FILES or None, queryset=Image.objects.none())
     if  request.method == 'POST':
-        form = Add_activity(request.POST)
-        ImageFormSet = ImageFormSet(request.POST, request.FILES, queryset=Image.objects.none())
-
-        if form.is_valid():
+        if form.is_valid() and formset.is_valid():
             activity = form.save()
-            if ImageFormSet.is_valid():
-                for image_form in ImageFormSet.cleaned_data:
-                        title = image_form.get('title')
-                        image = image_form.get('image')
+            for image_form in formset.cleaned_data:
+                if image_form and image_form.get('image'):
                         Image.objects.create(
-                            title = title,
-                            image = image,
+                            title = image_form.get('title'),
+                            image = image_form.get('image'),
                             activity =activity
                         )
-                    
-        messages.success (request, 'لقد تمت إضافة النشاط بنجاح.')
-        return redirect('ShowActivities')
-    else:
-        form = Add_activity()
-        ImageFormSet = ImageFormSet(queryset=Image.objects.none())
+            
+            messages.success (request, 'لقد تمت إضافة النشاط بنجاح.')
+            return redirect('ShowActivities')
+
     try:
         user = request.user
         user_info = UserProfile.objects.get(user = user)
     except:
         user_info = None
     context = {
-        'ImageFormSet': ImageFormSet,
+        'ImageFormSet': formset,
         'form' : form,
         'user_info': user_info,
         'announces': Announce.objects.all()
@@ -428,16 +423,9 @@ def add_course(request):
                         image = image,
                         course =course
                     )
-            for file_form in fileFormSet.cleaned_data:
-                    title = file_form.get('title')
-                    file = file_form.get('file')
-                    Files.objects.create(
-                        title = title,
-                        file = file,
-                        course =course
-                    )
-        messages.success (request, 'لقد تمت إضافة الدرس بنجاح.')
-        return redirect('UserCourseList')
+            
+            messages.success (request, 'لقد تمت إضافة الدرس بنجاح.')
+            return redirect('UserCourseList')
     else:
         form = Add_course()
         formset = ImageFormSet(queryset=Image.objects.none())

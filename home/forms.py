@@ -74,7 +74,7 @@ class UserLoginForm(forms.Form):
         if username and password:
             user =  authenticate(password = password, username = username)
             if not user:
-                raise forms.ValidationError(' رمز مسار أو كلمة المرور غير صحيحة.')
+                raise forms.ValidationError(' رمز مسار/رقم التأجير أو كلمة المرور غير صحيحة.')
             return super(UserLoginForm, self).clean(*args, **kwargs)
 
 
