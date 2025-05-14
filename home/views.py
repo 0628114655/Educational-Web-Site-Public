@@ -15,6 +15,10 @@ from django.core.mail import send_mail
 from django.conf import settings
 import urllib.parse
 import webbrowser
+import smtplib
+import ssl
+import certifi
+from email.message import EmailMessage
 
 
 # الصفحة الرئيسية
@@ -519,7 +523,7 @@ def studentAbsence(request, id):
                             f"ملاحظات إضافية: {notes}\n\n"
                             f"يرجى التواصل مع الإدارة لمزيد من التفاصيل.\n"
                             f"مع تحياتنا."
-                        ),
+                        )
             Absence.objects.create(
                 student = student,
                 status = status,
@@ -527,25 +531,19 @@ def studentAbsence(request, id):
                 dateTime = date,
                 absenceHours = hour
             )
-            parentEmail = getattr(student , 'parentEmail', None)
-            if parentEmail:
+            number_phone = getattr(student , 'number_phone', None)
+            if number_phone:
                 try:
-                    send_mail(
-                        subject='إخبار بغياب',
-                        message = send_message,
-                        from_email=settings.DEFAULT_FROM_EMAIL,
-                        recipient_list=[student.parentEmail],
-                        fail_silently=False,
-                                            )
-                    print('تم إرسال رسالة البريد الإلكتروني')
-                    encoded_message = urllib.parse.quote(message)
-                    whatsapp_url = f"https://wa.me/0715394358?text={encoded_message}"
+
+                    encoded_message = urllib.parse.quote(send_message)
+                    whatsapp_url = f"https://wa.me/+212{number_phone}?text={encoded_message}"
                     webbrowser.open(whatsapp_url)  
 
                 except Exception as e:
-                    print(f"فشل إرسال البريد الإلكتروني: {e}")
-        except:
+                    print(f"فشل إرسال رسالة الواتساب: {e}")
+        except Exception as e:
             message = 'لقد حدث خطأ غير متوقع'
+            print('حدث خطأ غير متوقع:', e)
     context = {
         'message' : message,
         'session' : session,
@@ -556,7 +554,6 @@ def studentAbsence(request, id):
         'monthlyAbsenceCount' : monthlyAbsenceCount,
     }
     return render(request, 'pages/attendance/absence/studentAbsence.html', context)
-
 # الدالة الخاصة بعرض الغياب الإجمالي للتلميذ
 @allowed_user(allowed_roles=['general_surveillance', 'admin'])
 def studentTotalAbsence(request, id):
