@@ -503,6 +503,7 @@ def studentAbsence(request, id):
     monthlyAbsence = Absence.objects.filter(dateTime__month = month, dateTime__year = year,  student= student)
     monthlyAbsenceCount = Absence.objects.filter(dateTime__month = month, dateTime__year = year, student= student).count()
     session = Hour.objects.all()
+  
     if request.method == 'POST':
         try:
             student = Student.objects.get(id = id)
@@ -511,6 +512,14 @@ def studentAbsence(request, id):
             date = request.POST.get('date')
             time = request.POST.get('time')
             hour = Hour.objects.get(id = time)
+            send_message = (
+                            f"ولي أمر التلميذ(ة) {student.first_name} {student.last_name}،\n"
+                            f"نحيطكم علماً أنه تم تسجيل غياب ابنكم بتاريخ {date}.\n"
+                            f"نوع الغياب: {status}\n"
+                            f"ملاحظات إضافية: {notes}\n\n"
+                            f"يرجى التواصل مع الإدارة لمزيد من التفاصيل.\n"
+                            f"مع تحياتنا."
+                        ),
             Absence.objects.create(
                 student = student,
                 status = status,
@@ -523,26 +532,16 @@ def studentAbsence(request, id):
                 try:
                     send_mail(
                         subject='إخبار بغياب',
-                        message = (
-                            f"ولي أمر التلميذ(ة) {student.first_name} {student.last_name}،\n"
-                            f"نحيطكم علماً أنه تم تسجيل غياب ابنكم بتاريخ {date}.\n"
-                            f"نوع الغياب: {status}\n"
-                            f"ملاحظات إضافية: {notes}\n\n"
-                            f"يرجى التواصل مع الإدارة لمزيد من التفاصيل.\n"
-                            f"مع تحياتنا."
-                        ),
+                        message = send_message,
                         from_email=settings.DEFAULT_FROM_EMAIL,
-                        recipient_list=[student.parentEmail],  
+                        recipient_list=[student.parentEmail],
                         fail_silently=False,
                                             )
-                          # ترميز النص بحيث يمكن إرساله عبر الرابط
+                    print('تم إرسال رسالة البريد الإلكتروني')
                     encoded_message = urllib.parse.quote(message)
-
-                    # إنشاء الرابط لفتح واتساب مع الرسالة
                     whatsapp_url = f"https://wa.me/0715394358?text={encoded_message}"
+                    webbrowser.open(whatsapp_url)  
 
-                    # فتح الرابط في نافذة جديدة (سيتم فتح واتساب ويب أو التطبيق مباشرة)
-                    webbrowser.open(whatsapp_url)                    
                 except Exception as e:
                     print(f"فشل إرسال البريد الإلكتروني: {e}")
         except:
