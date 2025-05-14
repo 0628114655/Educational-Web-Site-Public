@@ -10,7 +10,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'DJANGO_SECRET_KEY'
+SECRET_KEY = config('DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -23,6 +23,8 @@ EMAIL_HOST_USER = config('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
+print('EMAIL_HOST_USER:', EMAIL_HOST_USER)
+print('EMAIL_HOST_PASSWORD:', EMAIL_HOST_PASSWORD)
 
 
 ALLOWED_HOSTS = []

@@ -13,6 +13,8 @@ from django.db.models.functions import ExtractYear, ExtractMonth
 from collections import defaultdict
 from django.core.mail import send_mail
 from django.conf import settings
+import urllib.parse
+import webbrowser
 
 
 # الصفحة الرئيسية
@@ -533,6 +535,14 @@ def studentAbsence(request, id):
                         recipient_list=[student.parentEmail],  
                         fail_silently=False,
                                             )
+                          # ترميز النص بحيث يمكن إرساله عبر الرابط
+                    encoded_message = urllib.parse.quote(message)
+
+                    # إنشاء الرابط لفتح واتساب مع الرسالة
+                    whatsapp_url = f"https://wa.me/0715394358?text={encoded_message}"
+
+                    # فتح الرابط في نافذة جديدة (سيتم فتح واتساب ويب أو التطبيق مباشرة)
+                    webbrowser.open(whatsapp_url)                    
                 except Exception as e:
                     print(f"فشل إرسال البريد الإلكتروني: {e}")
         except:
