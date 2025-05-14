@@ -510,7 +510,6 @@ def studentAbsence(request, id):
   
     if request.method == 'POST':
         try:
-            student = Student.objects.get(id = id)
             status = request.POST.get('status')
             notes = request.POST.get('notes', '/')
             date = request.POST.get('date')
@@ -522,7 +521,6 @@ def studentAbsence(request, id):
                             f"نوع الغياب: {status}\n"
                             f"ملاحظات إضافية: {notes}\n\n"
                             f"يرجى التواصل مع الإدارة لمزيد من التفاصيل.\n"
-                            f"مع تحياتنا."
                         )
             Absence.objects.create(
                 student = student,
@@ -541,6 +539,10 @@ def studentAbsence(request, id):
 
                 except Exception as e:
                     print(f"فشل إرسال رسالة الواتساب: {e}")
+
+            messages.success(request, 'لقد تمت إضافة غياب بنجاح.')
+            return redirect('studentAbsence', id = student.id)
+            
         except Exception as e:
             message = 'لقد حدث خطأ غير متوقع'
             print('حدث خطأ غير متوقع:', e)
@@ -593,6 +595,7 @@ def studentTotalAbsence(request, id):
 # الدالة الخاصة بعرض وإضافة التقارير
 @allowed_user(allowed_roles=['general_surveillance', 'admin'])
 def add_reports(request, id):
+    whatsapp_url = None
     message = None
     user = request.user
     user_info = UserProfile.objects.get(user = user)
@@ -616,29 +619,23 @@ def add_reports(request, id):
                 date = date,
             )
             messages.success(request, 'لقد تمت إضافة التقرير بنجاح.')
-            parentEmail = getattr(student , 'parentEmail', None)
-            if parentEmail:
+            send_message = (
+                f"ولي أمر التلميذ(ة) {student.first_name} {student.last_name}،\n"
+                f"نحيطكم علماً أنه تم تسجيل تقرير سلوكي بابنكم بتاريخ {date}.\n"
+                f"تفاصيل التقرير:\n"
+                f"الموضوع: {report_content}\n"
+                f"ملاحظات إضافية: {instructions}\n\n"
+                f"يرجى التواصل مع الإدارة لمزيد من التفاصيل.\n"
+            )
+            number_phone = getattr(student , 'number_phone', None)
+            if number_phone:
                 try:
-                    send_mail(
-                        subject='إخبار بتقرير',
-                        message = (
-                            f"ولي أمر التلميذ(ة) {student.first_name} {student.last_name}،\n"
-                            f"نحيطكم علماً أنه تم تسجيل تقرير سلوكي بابنكم بتاريخ {date}.\n"
-                            f"تفاصيل التقرير:\n"
-                            f"الموضوع: {report_content}\n"
-                            f"ملاحظات إضافية: {instructions}\n\n"
-                            f"يرجى التواصل مع الإدارة لمزيد من التفاصيل.\n"
-                            f"مع تحياتنا."
-                        ),
-                        from_email=settings.DEFAULT_FROM_EMAIL,
-                        recipient_list=[student.parentEmail],  
-                        fail_silently=False,
-                                            )
+                    encoded_message = urllib.parse.quote(send_message)
+                    whatsapp_url = f"https://wa.me/+212{number_phone}?text={encoded_message}"
+                    # webbrowser.open(whatsapp_url)  
                 except Exception as e:
-                    print(f"فشل إرسال البريد الإلكتروني: {e}")
-
-            return redirect('add_reports', id = student.id)
-
+                    print(f"فشل إرسال رسالة الواتساب: {e}")
+            # return redirect('add_reports', id = student.id)
         except Exception as e:
             message = 'لقد حدث خطأ غير متوقع'
             print(e)
@@ -649,7 +646,8 @@ def add_reports(request, id):
         'all_materials' : all_materials,
         'material' : material,
         'student': student,
-        'reports' : reports
+        'reports' : reports,
+        'whatsapp_url' : whatsapp_url
     }
     return render(request, 'pages/attendance/reports/add_reports.html', context)
 
