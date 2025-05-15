@@ -1,5 +1,5 @@
  {% load static %}
- <nav class="navbar navbar-expand-lg navbar-light " style="font-size:small; font-weight:normal" dir="rtl">
+ <nav class="navbar navbar-expand-lg navbar-light " style="font-size:medium; font-weight:normal" dir="rtl">
         <a href="/" class="navbar-brand text-center d-flex align-items-center">
             <img src="{% static 'photos/aim.jpg' %}" alt="شعار الثانوية الإعدادية أنس بن مالك ">
             <h5>الثانوية الإعدادية أنس بن مالك </h5>
@@ -11,7 +11,7 @@
             <ul class="navbar-nav" style="border-radius:2px; color:#f8f9fa">
 
                 <!-- الصفحات المشتركة -->
-                <li class="nav-item {% if request.path == '/' %} active {% endif %} "><a href="/" class="nav-link">الرئيسية</a></li>
+                <li class="nav-item {% if request.path == '/' %} active {% endif %} "><a href="/" class="nav-link">  الرئيسية</a></li>
                 <li class="nav-item {% if request.resolver_match.url_name == 'announce' or request.resolver_match.url_name == 'add_announce' %} active {% endif %}"><a href="{% url 'announce' %}" class="nav-link">إعلانات</a></li>
                 <li class="nav-item {% if request.resolver_match.url_name == 'ShowActivities' or request.resolver_match.url_name == 'add_activity' %} active {% endif %}"><a href="{% url 'ShowActivities' %}" class="nav-link">أنشطة</a></li>
                 <li class="nav-item {% if request.resolver_match.url_name == 'course_res' or request.resolver_match.url_name == 'course' or request.resolver_match.url_name == 'search' or request.resolver_match.url_name == 'add_course' or request.resolver_match.url_name == 'UserCourseList' %} active {% endif %}  "><a href=" {% if 'admin' in request.user.groups.all|join:',' or 'teacher' in request.user.groups.all|join:',' or 'general_surveillance' in request.user.groups.all|join:','  %} {% url 'UserCourseList' %} {% else %} {% url 'course_res' %} {% endif %} " class="nav-link">دروس</a></li>

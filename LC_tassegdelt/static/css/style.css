@@ -2,6 +2,10 @@ body {
     background: #e6f7ff;
     color: #2f2d2d;
     position: relative;
+    font-size: large;
+    font-family: 'Tajawal' , 'Gupter', 'Marhey', sans-serif;
+    direction: rtl;
+    text-align: right;
 }
 .navbar-brand{
     display: flex;
@@ -9,18 +13,21 @@ body {
     justify-content: center;
 }
 .navbar-brand img {
-    max-width: 80px;
+    max-width: 75px;
     margin: 5px;
     border-radius: 2px;
 }
-.navbar-brand h3 {
-    font-family: 'Marhey', sans-serif;
+.navbar-brand h5 {
     color: #333333;
+    font-family: 'Reem Kufi Fun';
 }
 .nav-link, .nav-link:visited {
-    font-family: 'Marhey', sans-serif;
     font-size: larger;
     color: #f8f9fa;
+}
+
+.nav-item{
+    font-family: 'Reem Kufi Fun';
 }
 .nav-link.active {
     font-weight: bold;
@@ -29,29 +36,13 @@ body {
 .nav-link:hover{
     text-decoration: underline;
 }
-footer {
-    color: #333333;
-    padding: 20px 0;
-    bottom: 0;
- 
-}
-footer h4, footer h6, footer ul {
-    font-family: 'Marhey', sans-serif;
-}
-footer a, footer a:visited {
-    color: #333333;
-    text-decoration: none;
-}
-footer a:hover {
-    text-decoration: underline;
-}
 
 @media (max-width: 575.98px) {
     .navbar-brand {
         flex-direction: column; /* Change to column direction for small screens */
     }
     .navbar-brand img {
-        max-width: 60px; /* Adjust image size for small screens */
+        max-width: 55px; /* Adjust image size for small screens */
         margin-bottom: 10px; /* Add margin below the image */
     }
     .navbar-brand h3 {
@@ -64,13 +55,31 @@ footer a:hover {
         flex-direction: row; /* Change to row direction for larger screens */
     }
     .navbar-brand img {
-        max-width: 80px; /* Default image size */
+        max-width: 75px; /* Default image size */
         margin: 5px;
     }
     .navbar-brand h3 {
         font-size: 1.5rem; /* Default font size */
     }
 }
+
+footer {
+    color: #333333;
+    padding: 20px 0;
+    bottom: 0;
+    font-family: 'Reem Kufi Fun';
+ 
+}
+
+footer a, footer a:visited {
+    color: #333333;
+    text-decoration: none;
+}
+footer a:hover {
+    text-decoration: underline;
+}
+
+
 .carousel-indicators li {
             background-color: #2A52BE; /* لون المؤشر */
 }
@@ -78,10 +87,7 @@ footer a:hover {
             background-color: #ff6347; /* لون المؤشر النشط */
 }
 
-body{
-    direction: rtl;
-    text-align: right;
-}
+
 
 .courses-title{
     padding: 10px;
@@ -103,14 +109,13 @@ body{
 
 .announce-content{
     transition: .5s;
-
 }
 .announce-content p{
     transition: .5s;
 }
 .announce-content:hover p {
     transform: scale(1.02);
-  }
+}
 
 .announce-action{
     position: absolute;
@@ -152,21 +157,20 @@ body{
 }
 .announce-content .btn:hover {
     color:  #333333 !important;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);  /* إضافة ظل عند التحويم */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);  /* إضافة ظل عند التحويم */    
+}
 
+.announce-content .btn i {
+    color: #333333;  /* لون أيقونة داكن */
+}
     
-    }
+.announce-content .btn:hover i {
+    color: #fff;  /* تغيير لون الأيقونة إلى الأبيض عند التحويم */
+}
 
-    .announce-content .btn i {
-        color: #333333;  /* لون أيقونة داكن */
-    }
-    
-    .announce-content .btn:hover i {
-        color: #fff;  /* تغيير لون الأيقونة إلى الأبيض عند التحويم */
-    }
 .announce-content:hover {
     box-shadow: 0 0 30px #DDDDDD;
-  }
+}
 
 .btn-square {
     width: 120px;
@@ -175,9 +179,5 @@ body{
     display: flex;
     align-items: center;
     justify-content: center;
-  }
- 
-small{
-    font-size:x-small;
-    /* font-weight:100 */
 }
+ 

@@ -3,6 +3,9 @@ body {
     color: #2f2d2d;
     position: relative;
     font-size: large;
+    font-family: 'Tajawal' , 'Gupter', 'Marhey', sans-serif;
+    direction: rtl;
+    text-align: right;
 }
 .navbar-brand{
     display: flex;
@@ -14,12 +17,11 @@ body {
     margin: 5px;
     border-radius: 2px;
 }
-.navbar-brand h3 {
-    font-family: 'Marhey', sans-serif;
+.navbar-brand h5 {
     color: #333333;
+    font-family: 'Amiri+Quran';
 }
 .nav-link, .nav-link:visited {
-    font-family: 'Marhey', sans-serif;
     font-size: larger;
     color: #f8f9fa;
 }
@@ -36,9 +38,7 @@ footer {
     bottom: 0;
  
 }
-footer h4, footer h6, footer ul {
-    font-family: 'Marhey', sans-serif;
-}
+
 footer a, footer a:visited {
     color: #333333;
     text-decoration: none;
@@ -79,10 +79,7 @@ footer a:hover {
             background-color: #ff6347; /* لون المؤشر النشط */
 }
 
-body{
-    direction: rtl;
-    text-align: right;
-}
+
 
 .courses-title{
     padding: 10px;

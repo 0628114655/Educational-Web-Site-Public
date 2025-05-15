@@ -101,14 +101,14 @@
       </form>
       
 
-                            {% if whatsapp_url %}
-                              <div class="alert alert-success mt-3">
-                                <p>تم إنشاء رسالة واتساب لولي الأمر. اضغط على الزر أدناه لإرسالها:</p>
-                                <a href="{{ whatsapp_url }}" target="_blank" class="btn btn-success">
-                                  <i class="fab fa-whatsapp"></i> إرسال الرسالة عبر واتساب
-                                </a>
-                              </div>
-                            {% endif %}
+      {% if whatsapp_url %}
+        <div class="alert alert-success mt-3">
+          <p>تم إنشاء رسالة واتساب لولي الأمر. اضغط على الزر أدناه لإرسالها:</p>
+          <a href="{{ whatsapp_url }}" target="_blank" class="btn btn-success">
+            <i class="fab fa-whatsapp"></i> إرسال الرسالة عبر واتساب
+          </a>
+        </div>
+      {% endif %}
       <div class="table-responsive border" style="max-height: 600px; overflow-y: auto;">
         <h5 class="mx-3 my-2">سجل التقارير:</h5>
         {% if reports %}

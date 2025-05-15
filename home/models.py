@@ -185,6 +185,8 @@ class Report(models.Model):
     
     def __str__(self):
         return f'تقرير عن التلميذ(ة): {self.student.first_name} {self.student.last_name}'
+    class Meta:
+        ordering = ['-date']
 
 class Hour(models.Model):
     period_choice = [('الصباحية' , 'الصباحية'),('المسائية', 'المسائية')]
