@@ -501,10 +501,10 @@ def studentAbsence(request, id):
     message = None
     user = request.user
     user_info = UserProfile.objects.get(user = user)
-    sections = Section.objects.all()
     month = time_zone.now().date().month
     year = time_zone.now().date().year
     student = Student.objects.get(id = id)
+    students = Student.objects.filter(sections = student.sections)
     monthlyAbsence = Absence.objects.filter(dateTime__month = month, dateTime__year = year,  student= student)
     monthlyAbsenceCount = Absence.objects.filter(dateTime__month = month, dateTime__year = year, student= student).count()
     session = Hour.objects.all()
@@ -552,7 +552,7 @@ def studentAbsence(request, id):
         'session' : session,
         'user_info' : user_info,
         'student' : student,
-        'sections' : sections,
+        'students' : students,
         'monthlyAbsence' : monthlyAbsence,
         'monthlyAbsenceCount' : monthlyAbsenceCount,
         'whatsapp_url' : whatsapp_url,
@@ -584,6 +584,25 @@ def studentTotalAbsence(request, id):
             totalAbsences += len(absences)
             monthCount[year][month] = len(absences)
         yearCount[year] = totalAbsences
+    
+    number_phone = getattr(student , 'number_phone', None)
+    send_message = (
+                            f"ولي أمر التلميذ(ة) {student.first_name} {student.last_name}،\n"
+                            f"نحيطكم علماً أنه مجموع  غياب ابنكم في شهر {date}.\n"
+                            f"نوع الغياب: {status}\n"
+                            f"ملاحظات إضافية: {notes}\n\n"
+                            f"يرجى التواصل مع الإدارة لمزيد من التفاصيل.\n"
+                        )
+    if number_phone:
+                try:
+
+                    encoded_message = urllib.parse.quote(send_message)
+                    whatsapp_url = f"https://wa.me/+212{number_phone}?text={encoded_message}"
+                    # webbrowser.open(whatsapp_url)  
+
+                except Exception as e:
+                    print(f"فشل إرسال رسالة الواتساب: {e}")
+
 
     context = {
         'yearCount' : yearCount,

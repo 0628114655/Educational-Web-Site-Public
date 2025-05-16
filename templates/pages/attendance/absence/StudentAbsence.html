@@ -43,15 +43,15 @@
           <div class="row mb-3">
             <div class="col-4  mb-2">
               <div class="dropdown">
-                <button class="btn btn-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="false" id="sectionsDropdown">
-                  اختر القسم
+                <button class="btn btn-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="false" id="studentsDropdown">
+                  اختر التلميذ
                 </button>
-                <ul class="dropdown-menu shadow-sm" aria-labelledby="sectionsDropdown" style="max-height: 300px; overflow-y: auto;">
-                  {% for s in sections %}
+                <ul class="dropdown-menu shadow-sm" aria-labelledby="studentsDropdown" style="max-height: 300px; overflow-y: auto;">
+                  {% for s in students %}
                   <li>
                     <a class="dropdown-item d-flex justify-content-between align-items-center" 
-                      href="{% url 'ClassStudents' s.id %}">
-                      <span>{{ s.name }}</span>
+                      href="{% url 'studentAbsence' s.id %}">
+                      <span>{{ s.first_name }} {{s.last_name}} </span>
                     </a>
                   </li>
 
