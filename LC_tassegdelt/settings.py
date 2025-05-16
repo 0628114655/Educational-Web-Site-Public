@@ -2,9 +2,9 @@ from pathlib import Path
 import os
 from decouple import config
 import ssl
-import certifi
+# import certifi
 
-ssl_context = ssl.create_default_context(cafile=certifi.where())
+# ssl_context = ssl.create_default_context(cafile=certifi.where())
 
 
 

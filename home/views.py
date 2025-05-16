@@ -561,13 +561,15 @@ def studentAbsence(request, id):
 # الدالة الخاصة بعرض الغياب الإجمالي للتلميذ
 @allowed_user(allowed_roles=['general_surveillance', 'admin'])
 def studentTotalAbsence(request, id):
+    whatsapp_url = None
     user = request.user
     user_info = UserProfile.objects.get(user = user)
     student = Student.objects.get(id = id)
-    absences = Absence.objects.filter(student = student).annotate(year = ExtractYear('dateTime'), month = ExtractMonth('dateTime')).order_by('-dateTime')
+    absences_qs  = Absence.objects.filter(student = student).annotate(year = ExtractYear('dateTime'), month = ExtractMonth('dateTime')).order_by('-dateTime')
+
 
     grouped_absence = {}
-    for absence in absences:
+    for absence in absences_qs :
         year = absence.year
         month = absence.month
         if year not in grouped_absence:
@@ -581,35 +583,41 @@ def studentTotalAbsence(request, id):
         totalAbsences = 0
         monthCount[year] = {}
         for month, absences in months.items():
-            totalAbsences += len(absences)
+            totalAbsences += len(absences_qs )
             monthCount[year][month] = len(absences)
         yearCount[year] = totalAbsences
     
-    number_phone = getattr(student , 'number_phone', None)
+    month = time_zone.now().month
+    year = time_zone.now().year
+    monthly_absences = absences_qs.filter(month=month, year=year)
+    month_absences = monthly_absences.count()
+    non_justify = monthly_absences.filter(status='غير مبرر').count()
+
     send_message = (
                             f"ولي أمر التلميذ(ة) {student.first_name} {student.last_name}،\n"
-                            f"نحيطكم علماً أنه مجموع  غياب ابنكم في شهر {date}.\n"
-                            f"نوع الغياب: {status}\n"
-                            f"ملاحظات إضافية: {notes}\n\n"
+                            f"نحيطكم علماً أن مجموع غياب ابنكم خلال شهر  {month} بلغ {month_absences} .\n"
+                            f" منها {non_justify} غياب غير مبرر \n"
+                           
                             f"يرجى التواصل مع الإدارة لمزيد من التفاصيل.\n"
                         )
+    number_phone = getattr(student , 'number_phone', None)
     if number_phone:
-                try:
+        try:
+            encoded_message = urllib.parse.quote(send_message)
+            whatsapp_url = f"https://wa.me/+212{number_phone}?text={encoded_message}"
+            # webbrowser.open(whatsapp_url)  
 
-                    encoded_message = urllib.parse.quote(send_message)
-                    whatsapp_url = f"https://wa.me/+212{number_phone}?text={encoded_message}"
-                    # webbrowser.open(whatsapp_url)  
-
-                except Exception as e:
-                    print(f"فشل إرسال رسالة الواتساب: {e}")
-
+        except Exception as e:
+            print(f"فشل إرسال رسالة الواتساب: {e}")
 
     context = {
+        'whatsapp_url' : whatsapp_url,
         'yearCount' : yearCount,
         'monthCount' : monthCount,
         'user_info' : user_info,
         'student' : student,
         'grouped_absence' : dict(grouped_absence), 
+        'month_absences' : month_absences
     }
     return render(request, 'pages/attendance/absence/studentTotalAbsence.html', context)
 
