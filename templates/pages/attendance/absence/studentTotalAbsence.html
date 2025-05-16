@@ -54,12 +54,14 @@
                                     </span>
                                 </a>
                                 {% if whatsapp_url %}
-                                <div class="alert alert-success d-flex flex-wrap  align-items-auto justify-content-around my-2 mt-4 mx-2" >
-                                    <p>تم إنشاء رسالة واتساب لولي الأمر. اضغط على الزر أدناه لإرسالها:</p>
-                                    <a href="{{ whatsapp_url }}" target="_blank" class="btn btn-success d-flex align-items-auto justify-content-around ">
-                                        <i class="fab fa-whatsapp mx-1 my-auto"></i> إرسال الرسالة عبر واتساب
+                                <div class="alert alert-success d-flex flex-wrap align-items-center justify-content-between my-2 mt-2 mx-2 gap-3">
+                                    <p class="mb-0">تم إنشاء رسالة واتساب لولي الأمر. اضغط على الزر أدناه لإرسالها:</p>
+
+                                    <a href="{{ whatsapp_url }}" target="_blank" class="btn btn-success d-flex align-items-center">
+                                        <i class="fab fa-whatsapp mx-2"></i> إرسال الرسالة عبر واتساب
                                     </a>                                    
                                 </div>
+
                                 {% endif %}
                             </div>
                             <div class="collapse" id="collapseMonth{{ year }}{{ month }}">

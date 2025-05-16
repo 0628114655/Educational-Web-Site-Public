@@ -39,21 +39,32 @@
                     <small> مجموع التقارير خلال السنة {% with yearCount|get_item:year as total %} {{total}}  {% endwith %} </small>
                     )
                 </a>
+
             </p>
             <div class="collapse" id="collapseYear{{ year }}">
                 <div class="card card-body">
                     {% if reports %}
                         {% for month, report in reports.items %}
 
-                            <p class="d-inline-flex gap-1">
+                            <div class="d-flex align-items-center flex-wrap gap-3 mb-2">
                                 <a class="btn btn-outline-success my-2" data-toggle="collapse" href="#collapseMonth{{ year }}{{ month }}" role="button" aria-expanded="false" aria-controls="collapseMonth{{ year }}{{ month }}">
-                                    الشهر: {{ month }}
+                                    الشهر: {{ month|get_month }}
                                     (
                                     <span> مجموع الغياب خلال الشهر {% with monthCount|get_item:year|get_item:month as total %} {{total}} {% endwith %}  </span>
                                     )
 
                                 </a>
-                            </p>
+                                {% if whatsapp_url %}
+                                <div class="alert alert-success d-flex flex-wrap align-items-center justify-content-between my-2 mt-2 mx-2 gap-3">
+                                        <p class="mb-0">تم إنشاء رسالة واتساب لولي الأمر. اضغط على الزر أدناه لإرسالها:</p>
+
+                                        <a href="{{ whatsapp_url }}" target="_blank" class="btn btn-success d-flex align-items-center">
+                                            <i class="fab fa-whatsapp mx-2"></i> إرسال الرسالة عبر واتساب
+                                        </a>                                    
+                                    </div>
+
+                                {% endif %}
+                                </div>
                             <div class="collapse" id="collapseMonth{{ year }}{{ month }}">
                                 <div class="card card-body">
                                     {% for r in report %}

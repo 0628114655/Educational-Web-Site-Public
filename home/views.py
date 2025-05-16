@@ -17,9 +17,12 @@ import urllib.parse
 import webbrowser
 import smtplib
 import ssl
-import certifi
 from email.message import EmailMessage
 
+ARABIC_MONTHS = [
+    "", "يناير", "فبراير", "مارس", "أبريل", "ماي", "يونيو",
+    "يوليوز", "غشت", "شتنبر", "أكتوبر", "نونبر", "دجنبر"
+]
 
 # الصفحة الرئيسية
 def home (request): 
@@ -566,8 +569,6 @@ def studentTotalAbsence(request, id):
     user_info = UserProfile.objects.get(user = user)
     student = Student.objects.get(id = id)
     absences_qs  = Absence.objects.filter(student = student).annotate(year = ExtractYear('dateTime'), month = ExtractMonth('dateTime')).order_by('-dateTime')
-
-
     grouped_absence = {}
     for absence in absences_qs :
         year = absence.year
@@ -592,11 +593,12 @@ def studentTotalAbsence(request, id):
     monthly_absences = absences_qs.filter(month=month, year=year)
     month_absences = monthly_absences.count()
     non_justify = monthly_absences.filter(status='غير مبرر').count()
+    month = ARABIC_MONTHS[month]
 
     send_message = (
                             f"ولي أمر التلميذ(ة) {student.first_name} {student.last_name}،\n"
-                            f"نحيطكم علماً أن مجموع غياب ابنكم خلال شهر  {month} بلغ {month_absences} .\n"
-                            f" منها {non_justify} غياب غير مبرر \n"
+                            f"نحيطكم علماً أن مجموع غياب ابنكم خلال شهر  {month} من  هذا الموسم الدراسي بلغ {month_absences} (غياب) .\n"
+                            f" منها {non_justify} (غياب) غير مبرر \n"
                            
                             f"يرجى التواصل مع الإدارة لمزيد من التفاصيل.\n"
                         )
@@ -683,13 +685,14 @@ def add_reports(request, id):
 # الدالة الخاصة بعرض سجل التقارير
 @allowed_user(allowed_roles=['general_surveillance', 'admin'])
 def studentTotalreports(request, id):
+    whatsapp_url = None
     user = request.user
     user_info = UserProfile.objects.get(user = user)
     student = Student.objects.get(id = id)
-    reports = Report.objects.filter(student = student).annotate(year = ExtractYear('date'), month = ExtractMonth('date')).order_by('-date')
+    reports_qs = Report.objects.filter(student = student).annotate(year = ExtractYear('date'), month = ExtractMonth('date')).order_by('-date')
 
     grouped_reports = {}
-    for report in reports:
+    for report in reports_qs:
         year = report.year
         month = report.month
         if year not in grouped_reports:
@@ -703,11 +706,34 @@ def studentTotalreports(request, id):
         totalreports = 0
         monthCount[year] = {}
         for month, reports in months.items():
-            totalreports += len(reports)
-            monthCount[year][month] = len(reports)
+            totalreports += len(reports_qs)
+            monthCount[year][month] = len(reports_qs)
         yearCount[year] = totalreports
 
+    month = time_zone.now().month
+    year = time_zone.now().year
+    monthly_reports = reports_qs.filter(month=month, year=year)
+    month_reports = monthly_reports.count()
+    month = ARABIC_MONTHS[month]
+
+    send_message = (
+                            f"ولي أمر التلميذ(ة) {student.first_name} {student.last_name}،\n"
+                            f"نحيطكم علماً أن مجموع التقارير السلوكية بابنكم خلال شهر  {month} من  هذا الموسم الدراسي بلغت {month_reports} (تقارير) .\n"
+                            f"يرجى التواصل مع الإدارة لمزيد من التفاصيل.\n"
+                        )
+    number_phone = getattr(student , 'number_phone', None)
+    if number_phone:
+        try:
+            encoded_message = urllib.parse.quote(send_message)
+            whatsapp_url = f"https://wa.me/+212{number_phone}?text={encoded_message}"
+            # webbrowser.open(whatsapp_url)  
+
+        except Exception as e:
+            print(f"فشل إرسال رسالة الواتساب: {e}")
+
+
     context = {
+        'whatsapp_url' : whatsapp_url,
         'yearCount' : yearCount,
         'monthCount' : monthCount,
         'user_info' : user_info,
