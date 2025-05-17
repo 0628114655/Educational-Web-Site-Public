@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load custom_filter %}
+{% block content %}
+
+<div class="container-fluid my-5">
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+            {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+    <div class="mb-3 text-start">
+        <a href="{% url 'classes' %}" class="text-decoration-none" style="color: inherit; font-size: 0.9rem;">
+          <i class="fas fa-arrow-circle-left me-1"></i> الرجوع للصفحة السابقة
+        </a>
+    </div>
+      
+    <div class="mb-4  text-center text-info">
+        <h4>
+        سجل الغياب الشهري للقسم: {{ section.name }}
+        </h4>
+    </div>
+      
+      <div class="text-center mb-3">
+        <button class="btn btn-sm btn-primary" onclick="window.print()">
+          <i class="fas fa-print me-1"></i> طباعة
+        </button>
+      </div>
+      
+    <table class="table  table-hover table-bordered mb-0">
+        <thead>
+            <tr>
+                <th>الاسم الكامل للتلميذ</th>
+                {% for d in days %}
+                <th>{{d}}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for s in students %}
+            <tr>
+                <td> {{s.first_name}} {{s.last_name}} </td>
+                {% for d in days %}
+                <td>
+                    {% if grouped_absence|get_item:s|get_item:year|get_item:month|get_item:day %}
+                        X
+                    {% endif %}
+                </td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+
+
+        </tbody>
+    </table>
+ 
+
+
+</div>
+
+{% endblock %}

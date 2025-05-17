@@ -9,15 +9,14 @@ from .decorator import allowed_user
 from django.forms import modelformset_factory
 from django.contrib.auth.models import Group
 from django.contrib import messages
-from django.db.models.functions import ExtractYear, ExtractMonth
+from django.db.models.functions import ExtractYear, ExtractMonth, ExtractDay
 from collections import defaultdict
 from django.core.mail import send_mail
 from django.conf import settings
 import urllib.parse
-import webbrowser
-import smtplib
-import ssl
-from email.message import EmailMessage
+import calendar
+
+
 
 ARABIC_MONTHS = [
     "", "يناير", "فبراير", "مارس", "أبريل", "ماي", "يونيو",
@@ -623,6 +622,38 @@ def studentTotalAbsence(request, id):
         'month_absences' : month_absences
     }
     return render(request, 'pages/attendance/absence/studentTotalAbsence.html', context)
+
+@allowed_user(allowed_roles=['general_surveillance', 'admin'])
+def ClassTotalAbsence(request, id):
+    user = request.user
+    user_info = UserProfile.objects.get(user = user)
+    section = Section.objects.get(id = id)
+    students = Student.objects.filter(sections = section)
+    grouped_absence = {}
+    for s in students:
+        absences_qs  = Absence.objects.filter(student = s).annotate(year = ExtractYear('dateTime'), month = ExtractMonth('dateTime'), day = ExtractDay('dateTime')).order_by('-dateTime')
+        if s not in grouped_absence:
+            grouped_absence[s] = {}
+        for absence in absences_qs :
+            year = absence.year
+            month = absence.month
+            day = absence.day
+            if year not in grouped_absence[s]:
+                grouped_absence[s][year] = {}
+            if month not in grouped_absence[s][year]:
+                grouped_absence[s][year][month] = {}
+            grouped_absence[s][year][month][day] = 'X'
+    days_in_month = calendar.monthrange(year, month)[1]  
+    days = list(range(1, days_in_month + 1))
+    context = {
+        'section' : section,
+        'user_info' : user_info,
+        'students' : students,
+        'grouped_absence' : dict(grouped_absence), 
+        'days' : days
+    }
+    return render(request, 'pages/attendance/absence/ClassTotalAbsence.html', context)
+
 
 # الدالة الخاصة بعرض وإضافة التقارير
 @allowed_user(allowed_roles=['general_surveillance', 'admin'])
