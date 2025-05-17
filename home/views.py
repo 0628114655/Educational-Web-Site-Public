@@ -531,7 +531,8 @@ def studentAbsence(request, id):
                 status = status,
                 notes = notes,
                 dateTime = date,
-                absenceHours = hour
+                absenceHours = hour,
+                section = student.sections
             )
             number_phone = getattr(student , 'number_phone', None)
             if number_phone:

@@ -203,6 +203,7 @@ class Absence(models.Model):
     notes = models.CharField(max_length=200)
     status = models.CharField(max_length=15, choices=status_choices)
     absenceHours = models.ForeignKey(Hour, on_delete=models.CASCADE)
+    section = models.ForeignKey(Section, on_delete=models.CASCADE, null = True, blank=True)
     dateTime = models.DateField(null = True)
     counter = models.PositiveIntegerField()
     def save(self, *args, **kwargs):
