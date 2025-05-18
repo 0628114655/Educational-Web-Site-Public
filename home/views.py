@@ -625,35 +625,57 @@ def studentTotalAbsence(request, id):
 
 @allowed_user(allowed_roles=['general_surveillance', 'admin'])
 def ClassTotalAbsence(request, id):
+    from collections import defaultdict
     user = request.user
-    user_info = UserProfile.objects.get(user = user)
-    section = Section.objects.get(id = id)
-    students = Student.objects.filter(sections = section)
+    user_info = UserProfile.objects.get(user=user)
+    section = Section.objects.get(id=id)
+    students = Student.objects.filter(sections=section)
+
     grouped_absence = {}
+    available_months = set()  # 🟡 لجمع (السنة، الشهر)
+
     for s in students:
-        absences_qs  = Absence.objects.filter(student = s).annotate(year = ExtractYear('dateTime'), month = ExtractMonth('dateTime'), day = ExtractDay('dateTime')).order_by('-dateTime')
+        absences_qs = Absence.objects.filter(student=s).annotate(
+            year=ExtractYear('dateTime'),
+            month=ExtractMonth('dateTime'),
+            day=ExtractDay('dateTime')
+        ).order_by('-dateTime')
+
         if s not in grouped_absence:
             grouped_absence[s] = {}
-        for absence in absences_qs :
+
+        for absence in absences_qs:
             year = absence.year
             month = absence.month
             day = absence.day
+
+            available_months.add((year, month))  # 🟡 تسجيل السنة والشهر
+
             if year not in grouped_absence[s]:
                 grouped_absence[s][year] = {}
             if month not in grouped_absence[s][year]:
                 grouped_absence[s][year][month] = {}
             grouped_absence[s][year][month][day] = 'X'
-    days_in_month = calendar.monthrange(year, month)[1]  
+
+    # 🔵 حدد السنة والشهر الحاليين لعرضهم كبداية
+    now = time_zone.now()
+    year = now.year
+    month = now.month
+
+    days_in_month = calendar.monthrange(year, month)[1]
     days = list(range(1, days_in_month + 1))
+
     context = {
-        'section' : section,
-        'user_info' : user_info,
-        'students' : students,
-        'grouped_absence' : dict(grouped_absence), 
-        'days' : days
+        'year': year,
+        'month': month,
+        'available_months': sorted(available_months, reverse=True),  # 🟢 لإرسال القائمة للواجهة
+        'section': section,
+        'user_info': user_info,
+        'students': students,
+        'grouped_absence': grouped_absence,
+        'days': days
     }
     return render(request, 'pages/attendance/absence/ClassTotalAbsence.html', context)
-
 
 # الدالة الخاصة بعرض وإضافة التقارير
 @allowed_user(allowed_roles=['general_surveillance', 'admin'])

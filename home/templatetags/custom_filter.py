@@ -5,7 +5,12 @@ import calendar
 
 @register.filter
 def get_item(dictionary, key):
-    return dictionary.get(key)
+    try:
+        if dictionary is not None and key is not None:
+            return dictionary.get(key)
+    except AttributeError:
+        pass
+    return None
 
 ARABIC_MONTHS = {
     1: "يناير",
