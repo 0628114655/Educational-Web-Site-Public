@@ -29,45 +29,70 @@
         </button>
     </div>
 
-    {% for a in available_months %}
-    
-    <div class="mb-3 d-inline ">
-        <p class="d-inline-flex gap-1">
-            <a class="btn btn-outline-primary" data-toggle="collapse" href="#collapseYear{{ a }}" role="button" aria-expanded="false" aria-controls="collapseYear{{ a }}">
-                السنة: {{ a }}
+    {% for s, years in grouped_absence.items %}
+        {% for year, absences in years.items %}
+        <div class="mb-3 d-inline ">
+                <p class="d-inline-flex gap-1">
+                    <a class="btn btn-outline-primary" data-toggle="collapse" href="#collapseYear{{ year }}" role="button" aria-expanded="false" aria-controls="collapseYear{{ year }}">
+                        السنة: {{ year }}
 
-            </a>
-        </p>
-        <div class="collapse" id="collapseYear{{ a }}">
-                <table class="table table-hover table-bordered mb-0" style=" width:70% ;overflow-x: scroll;">
-                    <thead>
-                        <tr>
-                            <th>الاسم الكامل للتلميذ</th>
-                            {% for d in days %}
-                                <th>{{ d }}</th>
-                            {% endfor %}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for s in students %}
-                            <tr>
-                                <td>{{ s.first_name }} {{ s.last_name }}</td>
-                                {% for d in days %}
-                                    <td>
-                                        {% if grouped_absence|get_item:s|get_item:year|get_item:month|get_item:d %}
-                                            X
-                                        {% endif %}
-                                    </td>
-                                {% endfor %}
-                            </tr>
+                    </a>
+                </p>
+                <div class="collapse" id="collapseYear{{ year }}">
+                    {% if absences %}
+                        {% for month, d in absences.items %}
+                            <p class="d-inline-flex gap-1">
+                                <a class="btn btn-outline-primary" data-toggle="collapse" href="#collapseMonth{{ month }}" role="button" aria-expanded="false" aria-controls="collapseMonth{{ month }}">
+                                    الشهر: {{ month }}
+            
+                                </a>
+                            </p>
+                            <div class="collapse" id="collapseMonth{{ month }}">
+                                <table class="table table-hover table-bordered mb-0" style=" width:70% ;overflow-x: scroll;">
+                                   <thead>
+                                        <tr>
+                                            <th rowspan="2">الاسم الكامل للتلميذ</th>
+                                            {% for d in days %}
+                                                <th colspan="8" class="text-center">{{ d }}</th>
+                                            {% endfor %}
+                                        </tr>
+                                        <tr>
+                                            {% for d in days %}
+                                                {% for h in 1|to_range:9 %}
+                                                    <th>{{ h }}</th>
+                                                {% endfor %}
+                                            {% endfor %}
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for s in students %}
+                                            <tr>
+                                                <td>{{ s.first_name }} {{ s.last_name }}</td>
+                                                
+                                                {% for d in days %}
+                                                    {% for h in 1|to_range:9 %}
+                                                        <td>
+                                                            {% if grouped_absence|get_item:s|get_item:year|get_item:month|get_item:d|get_item:h %}
+                                                                X
+                                                            {% endif %}
+                                                        </td>
+                                                    {% endfor %}
+                                                {% endfor %}
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
                         {% endfor %}
-                    </tbody>
-                </table>
-        </div>
+                    {% endif %}
+                </div>
 
-    {% endfor %}
-
+                
+                
+            </div>
+            {% endfor %}
+        {% endfor %}
+    
 
 </div>
-
 {% endblock %}

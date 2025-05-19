@@ -30,3 +30,7 @@ ARABIC_MONTHS = {
 @register.filter
 def get_month(number):
     return ARABIC_MONTHS.get(number)
+
+@register.filter
+def to_range(start, end):
+    return range(start, end)

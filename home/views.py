@@ -9,7 +9,7 @@ from .decorator import allowed_user
 from django.forms import modelformset_factory
 from django.contrib.auth.models import Group
 from django.contrib import messages
-from django.db.models.functions import ExtractYear, ExtractMonth, ExtractDay
+from django.db.models.functions import ExtractYear, ExtractMonth, ExtractDay, ExtractWeek
 from collections import defaultdict
 from django.core.mail import send_mail
 from django.conf import settings
@@ -632,12 +632,13 @@ def ClassTotalAbsence(request, id):
     students = Student.objects.filter(sections=section)
 
     grouped_absence = {}
-    available_months = set()  # 🟡 لجمع (السنة، الشهر)
+    available_months = set()  
 
     for s in students:
         absences_qs = Absence.objects.filter(student=s).annotate(
             year=ExtractYear('dateTime'),
             month=ExtractMonth('dateTime'),
+            week=ExtractWeek('dateTime'),
             day=ExtractDay('dateTime')
         ).order_by('-dateTime')
 
@@ -648,16 +649,17 @@ def ClassTotalAbsence(request, id):
             year = absence.year
             month = absence.month
             day = absence.day
+            absenceHours = absence.absenceHours
 
-            available_months.add((year, month))  # 🟡 تسجيل السنة والشهر
+            available_months.add((year, month)) 
 
             if year not in grouped_absence[s]:
                 grouped_absence[s][year] = {}
             if month not in grouped_absence[s][year]:
                 grouped_absence[s][year][month] = {}
-            grouped_absence[s][year][month][day] = 'X'
+            grouped_absence[s][year][month][day] = {}
+            grouped_absence[s][year][month][day][absenceHours] = 'X'
 
-    # 🔵 حدد السنة والشهر الحاليين لعرضهم كبداية
     now = time_zone.now()
     year = now.year
     month = now.month
@@ -668,7 +670,9 @@ def ClassTotalAbsence(request, id):
     context = {
         'year': year,
         'month': month,
-        'available_months': sorted(available_months, reverse=True),  # 🟢 لإرسال القائمة للواجهة
+        'absenceHours' : absenceHours,
+        'day' : day,
+        'available_months': sorted(available_months, reverse=True), 
         'section': section,
         'user_info': user_info,
         'students': students,
