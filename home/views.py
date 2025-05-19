@@ -9,12 +9,14 @@ from .decorator import allowed_user
 from django.forms import modelformset_factory
 from django.contrib.auth.models import Group
 from django.contrib import messages
-from django.db.models.functions import ExtractYear, ExtractMonth, ExtractDay, ExtractWeek
+from django.db.models.functions import ExtractYear, ExtractMonth, ExtractDay, ExtractWeek, ExtractHour
 from collections import defaultdict
 from django.core.mail import send_mail
 from django.conf import settings
 import urllib.parse
+from collections import defaultdict
 import calendar
+import datetime
 
 
 
@@ -623,61 +625,47 @@ def studentTotalAbsence(request, id):
     }
     return render(request, 'pages/attendance/absence/studentTotalAbsence.html', context)
 
+
+
 @allowed_user(allowed_roles=['general_surveillance', 'admin'])
 def ClassTotalAbsence(request, id):
-    from collections import defaultdict
     user = request.user
     user_info = UserProfile.objects.get(user=user)
     section = Section.objects.get(id=id)
     students = Student.objects.filter(sections=section)
-
-    grouped_absence = {}
-    available_months = set()  
+    
+    grouped_absence = defaultdict(lambda: defaultdict(lambda: defaultdict(lambda: defaultdict(lambda: defaultdict(str)))))
 
     for s in students:
-        absences_qs = Absence.objects.filter(student=s).annotate(
+        absences = Absence.objects.filter(student=s).annotate(
             year=ExtractYear('dateTime'),
             month=ExtractMonth('dateTime'),
             week=ExtractWeek('dateTime'),
-            day=ExtractDay('dateTime')
-        ).order_by('-dateTime')
+            day=ExtractDay('dateTime'),
+        )
 
-        if s not in grouped_absence:
-            grouped_absence[s] = {}
+        for absence in absences:
+            y = absence.year
+            m = absence.month
+            w = absence.week
+            d = absence.day
+            h = absence.absenceHours.id
+            grouped_absence[s][y][m][w][d, h] = 'X'
 
-        for absence in absences_qs:
-            year = absence.year
-            month = absence.month
-            day = absence.day
-            absenceHours = absence.absenceHours
+    current_year = time_zone.now().year
+    recent_years = list(range(current_year - 4, current_year + 1))
 
-            available_months.add((year, month)) 
-
-            if year not in grouped_absence[s]:
-                grouped_absence[s][year] = {}
-            if month not in grouped_absence[s][year]:
-                grouped_absence[s][year][month] = {}
-            grouped_absence[s][year][month][day] = {}
-            grouped_absence[s][year][month][day][absenceHours] = 'X'
-
-    now = time_zone.now()
-    year = now.year
-    month = now.month
-
-    days_in_month = calendar.monthrange(year, month)[1]
-    days = list(range(1, days_in_month + 1))
+    all_days = {m: list(range(1, calendar.monthrange(current_year, m)[1] + 1)) for m in range(1, 13)}
+    hours_range = range(1, 9)  # الحصص من 1 إلى 8
 
     context = {
-        'year': year,
-        'month': month,
-        'absenceHours' : absenceHours,
-        'day' : day,
-        'available_months': sorted(available_months, reverse=True), 
         'section': section,
         'user_info': user_info,
         'students': students,
         'grouped_absence': grouped_absence,
-        'days': days
+        'years': recent_years,
+        'days_by_month': all_days,
+        'hours_range': hours_range,
     }
     return render(request, 'pages/attendance/absence/ClassTotalAbsence.html', context)
 

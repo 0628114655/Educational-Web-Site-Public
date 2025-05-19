@@ -18,81 +18,63 @@
         </a>
     </div>
 
-    <div class="mb-4 text-center text-info">
-        <h4>سجل الغياب الشهري للقسم: {{ section.name }}</h4>
-        <h6>السنة: {{ year }} / الشهر: {{ month }}</h6>
-    </div>
+    <h4 class="text-info text-center">سجل الغياب الشهري للقسم: {{ section.name }}</h4>
 
-    <div class="text-center mb-3">
-        <button class="btn btn-sm btn-primary" onclick="window.print()">
-            <i class="fas fa-print me-1"></i> طباعة
-        </button>
-    </div>
+  {% for year in years %}
+    <div class="card my-3">
+      <div class="card-header bg-primary text-white">السنة: {{ year }}</div>
+      <div class="card-body">
 
-    {% for s, years in grouped_absence.items %}
-        {% for year, absences in years.items %}
-        <div class="mb-3 d-inline ">
-                <p class="d-inline-flex gap-1">
-                    <a class="btn btn-outline-primary" data-toggle="collapse" href="#collapseYear{{ year }}" role="button" aria-expanded="false" aria-controls="collapseYear{{ year }}">
-                        السنة: {{ year }}
+        {% for month, days in days_by_month.items %}
+          <div class="card my-2">
+            <div class="card-header bg-secondary text-white">الشهر: {{ month }}</div>
+            <div class="card-body">
 
-                    </a>
-                </p>
-                <div class="collapse" id="collapseYear{{ year }}">
-                    {% if absences %}
-                        {% for month, d in absences.items %}
-                            <p class="d-inline-flex gap-1">
-                                <a class="btn btn-outline-primary" data-toggle="collapse" href="#collapseMonth{{ month }}" role="button" aria-expanded="false" aria-controls="collapseMonth{{ month }}">
-                                    الشهر: {{ month }}
-            
-                                </a>
-                            </p>
-                            <div class="collapse" id="collapseMonth{{ month }}">
-                                <table class="table table-hover table-bordered mb-0" style=" width:70% ;overflow-x: scroll;">
-                                   <thead>
-                                        <tr>
-                                            <th rowspan="2">الاسم الكامل للتلميذ</th>
-                                            {% for d in days %}
-                                                <th colspan="8" class="text-center">{{ d }}</th>
-                                            {% endfor %}
-                                        </tr>
-                                        <tr>
-                                            {% for d in days %}
-                                                {% for h in 1|to_range:9 %}
-                                                    <th>{{ h }}</th>
-                                                {% endfor %}
-                                            {% endfor %}
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {% for s in students %}
-                                            <tr>
-                                                <td>{{ s.first_name }} {{ s.last_name }}</td>
-                                                
-                                                {% for d in days %}
-                                                    {% for h in 1|to_range:9 %}
-                                                        <td>
-                                                            {% if grouped_absence|get_item:s|get_item:year|get_item:month|get_item:d|get_item:h %}
-                                                                X
-                                                            {% endif %}
-                                                        </td>
-                                                    {% endfor %}
-                                                {% endfor %}
-                                            </tr>
-                                        {% endfor %}
-                                    </tbody>
-                                </table>
-                            </div>
+              {% for week in 1|to_range:5 %}
+                <h6>الأسبوع {{ week }}</h6>
+                <table class="table table-bordered text-center">
+                  <thead>
+                    <tr>
+                      <th>الاسم</th>
+                      {% for d in days %}
+                        <th colspan="8">{{ d }}</th>
+                      {% endfor %}
+                    </tr>
+                    <tr>
+                      <th></th>
+                      {% for d in days %}
+                        {% for h in hours_range %}
+                          <th>{{ h }}</th>
                         {% endfor %}
-                    {% endif %}
-                </div>
-
-                
-                
+                      {% endfor %}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for s in students %}
+                      <tr>
+                        <td>{{ s.first_name }} {{ s.last_name }}</td>
+                        {% for d in days %}
+                          {% for h in hours_range %}
+                            <td>
+                              {% if grouped_absence|get_item:s|get_item:year|get_item:month|get_item:week|get_item:(d,h) %}
+                                X
+                              {% endif %}
+                            </td>
+                          {% endfor %}
+                        {% endfor %}
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              {% endfor %}
+              
             </div>
-            {% endfor %}
+          </div>
         {% endfor %}
-    
+        
+      </div>
+    </div>
+  {% endfor %}
 
 </div>
 {% endblock %}
