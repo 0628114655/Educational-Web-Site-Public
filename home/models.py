@@ -62,6 +62,13 @@ class Student(models.Model):
     parentEmail = models.EmailField(null=True)
     def __str__(self):
         return f'{self.first_name} {self.last_name}' 
+    
+    
+    @property
+    def get_non_justify(self, month, year):
+        self_non_justify = Absence.objects.filter( student = self ,status = 'غير مبرر', dateTime__year = year, dateTime__month=month).count()
+        return self_non_justify
+
 
 class Staff(models.Model):
     choices =  [('أستاذ', 'أستاذ'), ('حارس عام', 'حارس عام'), ('مشرف', 'مشرف')]
@@ -206,13 +213,15 @@ class Absence(models.Model):
     section = models.ForeignKey(Section, on_delete=models.CASCADE, null = True, blank=True)
     dateTime = models.DateField(null = True)
     counter = models.PositiveIntegerField()
+
+
     def save(self, *args, **kwargs):
         if not self.counter:
             self.counter = Absence.objects.filter(student = self.student).count() + 1
         super().save(*args, **kwargs)
 
     def __str__ (self):
-        return f'غياب للتلميذ(ة) {self.student.first_name} {self.student.last_name} , بتاريخ {self.dateTime} ( {self.absenceHours} )'
+        return f'غياب للتلميذ(ة) {self.student.first_name} {self.student.last_name}, بتاريخ {self.dateTime} ( {self.absenceHours} )'
 
     class Meta:
         ordering = ['-dateTime']

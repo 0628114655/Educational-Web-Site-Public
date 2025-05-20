@@ -4,39 +4,39 @@
 {% block content %}
 
 <div class="container-fluid my-5">
+
     {% if messages %}
         {% for message in messages %}
             <div class="alert alert-{{ message.tags }}">
-            {{ message }}
+                {{ message }}
             </div>
         {% endfor %}
     {% endif %}
+
     <div class="mb-3 text-start">
         <a href="{% url 'studentAbsence' student.id %}" class="text-decoration-none" style="color: inherit; font-size: 0.9rem;">
-          <i class="fas fa-arrow-circle-left me-1"></i> الرجوع للصفحة السابقة
+            <i class="fas fa-arrow-circle-left me-1"></i> الرجوع للصفحة السابقة
         </a>
     </div>
-      
-    <div class="mb-4  text-center text-info">
+
+    <div class="mb-4 text-center text-info">
         <h4>
-        السجل العام للغياب (التلميذ(ة): {{ student.first_name }} {{ student.last_name }})
+            السجل العام للغياب (التلميذ(ة): {{ student.first_name }} {{ student.last_name }})
         </h4>
     </div>
-      
-      <div class="text-center mb-3">
+
+    <div class="text-center mb-3">
         <button class="btn btn-sm btn-primary" onclick="window.print()">
-          <i class="fas fa-print me-1"></i> طباعة
+            <i class="fas fa-print me-1"></i> طباعة
         </button>
-      </div>
-      
+    </div>
+
     {% for year, absences in grouped_absence.items %}
- 
-        <div class="mb-3 d-inline ">
+        <div class="mb-3 d-inline">
             <p class="d-inline-flex gap-1">
                 <a class="btn btn-outline-primary" data-toggle="collapse" href="#collapseYear{{ year }}" role="button" aria-expanded="false" aria-controls="collapseYear{{ year }}">
-                    السنة: {{ year }}
-                    (
-                    <small> مجموع الغياب خلال السنة {% with yearCount|get_item:year as total %} {{total}}  {% endwith %} </small>
+                    السنة: {{ year }} (
+                        <small>مجموع الغياب خلال السنة: {% with yearCount|get_item:year as total %}{{ total }}{% endwith %}</small>
                     )
                 </a>
             </p>
@@ -44,41 +44,43 @@
                 <div class="card card-body">
                     {% if absences %}
                         {% for month, absence in absences.items %}
-
-                            <div class="d-flex align-items-center flex-wrap gap-3 mb-2">
-                                <a class="btn btn-outline-success my-2 " style="width: 320px "  data-toggle="collapse" href="#collapseMonth{{ year }}{{ month }}" role="button" aria-expanded="false" aria-controls="collapseMonth{{ year }}{{ month }}">
-                                    الشهر: {{ month|get_month }}
-                                    (
-                                    <span> مجموع الغياب خلال الشهر {% with monthCount|get_item:year|get_item:month as total %} {{total}} {% endwith %} 
-                                        )
-                                    </span>
+                            <div class="d-flex align-items-center  flex-wrap gap-3 mb-2">
+                                <a class="btn btn-outline-success my-2" style="width: 320px" data-toggle="collapse" href="#collapseMonth{{ year }}{{ month }}" role="button" aria-expanded="false" aria-controls="collapseMonth{{ year }}{{ month }}">
+                                    الشهر: {{ month|get_month }} (
+                                    مجموع الغياب: {% with monthCount|get_item:year|get_item:month as total %}{{ total }}{% endwith %}
+                                    )
                                 </a>
-                                {% if whatsapp_url %}
-                                <div class="alert alert-success d-flex flex-wrap align-items-center justify-content-between my-2 mt-2 mx-2 gap-3">
+                                {% if student.number_phone %}
+                                <div class="alert alert-success d-flex flex-wrap align-items-center justify-content-between my-2 mt-2 mx-2 gap-3 ">
                                     <p class="mb-0">تم إنشاء رسالة واتساب لولي الأمر. اضغط على الزر أدناه لإرسالها:</p>
-
-                                    <a href="{{ whatsapp_url }}" target="_blank" class="btn btn-success d-flex align-items-center">
+                                    <a href="#" target="_blank"
+                                       class="btn btn-success d-flex align-items-center send-whatsapp-message"
+                                       data-month="{{ month|get_month }}"
+                                       data-month-absences="{% with monthCount|get_item:year|get_item:month as total %}{{ total }}{% endwith %}"
+                                       data-non-justify="{{student.get_non_justify}}"
+                                       data-message="{{ send_message|urlencode }}"
+                                       data-full-name="{{ student.first_name }} {{ student.last_name }}"
+                                       data-phone="{{ student.number_phone }}">
                                         <i class="fab fa-whatsapp mx-2"></i> إرسال الرسالة عبر واتساب
-                                    </a>                                    
+                                    </a>
                                 </div>
-
                                 {% endif %}
                             </div>
+
                             <div class="collapse" id="collapseMonth{{ year }}{{ month }}">
                                 <div class="card card-body">
                                     {% for a in absence %}
                                         <div class="card my-3 shadow-sm">
-                                            <div class="card-header  {% if a.status == 'مبرر' %} text-success fw-bold {% else %}  text-danger fw-bold {% endif %}">
+                                            <div class="card-header {% if a.status == 'مبرر' %}text-success fw-bold{% else %}text-danger fw-bold{% endif %}">
                                                 <strong>غياب رقم: {{ a.counter }}</strong>
                                             </div>
-                                            
-                                            <div class="card-body  ">
-                                                <p><strong> ساعة الغياب:</strong> {{ a.absenceHours }}</p>
+                                            <div class="card-body">
+                                                <p><strong>ساعة الغياب:</strong> {{ a.absenceHours }}</p>
                                                 <p><strong>الحالة:</strong> {{ a.status }}</p>
                                                 <p><strong>التاريخ:</strong> {{ a.dateTime|date:"Y-m-d" }}</p>
                                                 <p><strong>الملاحظات:</strong> {{ a.notes }}</p>
                                                 <div class="d-flex justify-content-end">
-                                                    <a href="{% url 'Delete' a.id %}"  onclick="return confirm ('هل أنت متأكد من الحذف؟')" class="btn btn-outline-danger my-2 " onclick="return confirm('هل أنت متأكد من الحذف؟');">   حذف الغياب </a>
+                                                    <a href="{% url 'Delete' a.id %}" onclick="return confirm('هل أنت متأكد من الحذف؟');" class="btn btn-outline-danger my-2">حذف الغياب</a>
                                                 </div>
                                             </div>
                                         </div>
@@ -92,11 +94,31 @@
                 </div>
             </div>
         </div>
-
-        {% empty %}
+    {% empty %}
         <p class="text-center text-muted">لا توجد بيانات غياب متاحة.</p>
-        {% endfor %}
+    {% endfor %}
 
 </div>
+
+<script>
+document.querySelectorAll('.send-whatsapp-message').forEach(button => {
+    button.addEventListener('click', function (e) {
+        e.preventDefault();
+
+       const month = this.dataset.month.trim();
+        const absences = this.dataset.monthAbsences.trim();
+        const nonJustify = this.dataset.nonJustify.trim();
+        const fullName = this.dataset.fullName.trim();
+        const phone = this.dataset.phone.trim();
+
+
+        message =   `ولي أمر التلميذ(ة) ${fullName}،\n نحيطكم علماً أن مجموع غياب ابنكم خلال شهر  ${month} من  هذا الموسم الدراسي بلغ ${absences} (غياب) يرجى التواصل مع الإدارة لمزيد من التفاصيل.\n`
+
+        const encoded = encodeURIComponent(message);
+        const whatsapp_url = `https://wa.me/212${phone}?text=${encoded}`;
+        window.open(whatsapp_url, '_blank');
+    });
+});
+</script>
 
 {% endblock %}

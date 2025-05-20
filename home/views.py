@@ -566,6 +566,7 @@ def studentAbsence(request, id):
 # الدالة الخاصة بعرض الغياب الإجمالي للتلميذ
 @allowed_user(allowed_roles=['general_surveillance', 'admin'])
 def studentTotalAbsence(request, id):
+    send_message = None
     whatsapp_url = None
     user = request.user
     user_info = UserProfile.objects.get(user = user)
@@ -586,7 +587,7 @@ def studentTotalAbsence(request, id):
         totalAbsences = 0
         monthCount[year] = {}
         for month, absences in months.items():
-            totalAbsences += len(absences_qs )
+            totalAbsences += len(absences )
             monthCount[year][month] = len(absences)
         yearCount[year] = totalAbsences
     
@@ -594,27 +595,11 @@ def studentTotalAbsence(request, id):
     year = time_zone.now().year
     monthly_absences = absences_qs.filter(month=month, year=year)
     month_absences = monthly_absences.count()
-    non_justify = monthly_absences.filter(status='غير مبرر').count()
     month = ARABIC_MONTHS[month]
 
-    send_message = (
-                            f"ولي أمر التلميذ(ة) {student.first_name} {student.last_name}،\n"
-                            f"نحيطكم علماً أن مجموع غياب ابنكم خلال شهر  {month} من  هذا الموسم الدراسي بلغ {month_absences} (غياب) .\n"
-                            f" منها {non_justify} (غياب) غير مبرر \n"
-                           
-                            f"يرجى التواصل مع الإدارة لمزيد من التفاصيل.\n"
-                        )
-    number_phone = getattr(student , 'number_phone', None)
-    if number_phone:
-        try:
-            encoded_message = urllib.parse.quote(send_message)
-            whatsapp_url = f"https://wa.me/+212{number_phone}?text={encoded_message}"
-            # webbrowser.open(whatsapp_url)  
-
-        except Exception as e:
-            print(f"فشل إرسال رسالة الواتساب: {e}")
 
     context = {
+        'send_message' : send_message,
         'whatsapp_url' : whatsapp_url,
         'yearCount' : yearCount,
         'monthCount' : monthCount,
