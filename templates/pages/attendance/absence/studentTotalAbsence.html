@@ -57,7 +57,7 @@
                                        class="btn btn-success d-flex align-items-center send-whatsapp-message"
                                        data-month="{{ month|get_month }}"
                                        data-month-absences="{% with monthCount|get_item:year|get_item:month as total %}{{ total }}{% endwith %}"
-                                       data-non-justify="{{absence_data|get_item:year|get_item:month}}"
+                                       data-non-justify="{% with absence_data|get_item:year|get_item:month as total %}{{ total }}{% endwith %}"
                                        data-message="{{ send_message|urlencode }}"
                                        data-full-name="{{ student.first_name }} {{ student.last_name }}"
                                        data-phone="{{ student.number_phone }}">
@@ -112,7 +112,7 @@ document.querySelectorAll('.send-whatsapp-message').forEach(button => {
         const phone = this.dataset.phone.trim();
 
 
-        message =   `ولي أمر التلميذ(ة) ${fullName}،\n نحيطكم علماً أن مجموع غياب ابنكم (ابنتكم) خلال شهر  ${month} من  هذا الموسم الدراسي بلغ ${absences} (غياب) منها ${nonJustify} غياب غير مبرر يرجى التواصل مع الإدارة لمزيد من التفاصيل.\n`
+        message =   `ولي أمر التلميذ(ة) ${fullName}،\n نحيطكم علماً أن مجموع غياب ابنكم (ابنتكم) خلال شهر  ${month} من  هذا الموسم الدراسي بلغ ${absences} {% if ${nonJustify} %} (غياب) منها ${nonJustify} {% endif %} غياب غير مبرر يرجى التواصل مع الإدارة لمزيد من التفاصيل.\n`
 
         const encoded = encodeURIComponent(message);
         const whatsapp_url = `https://wa.me/212${phone}?text=${encoded}`;

@@ -588,6 +588,9 @@ def studentTotalAbsence(request, id):
             totalAbsences += len(absences )
             monthCount[year][month] = len(absences)
         yearCount[year] = totalAbsences
+      
+
+
     absence_data = {}  
     for year, months in grouped_absence.items():
         absence_data[year] = {}

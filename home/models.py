@@ -64,10 +64,20 @@ class Student(models.Model):
         return f'{self.first_name} {self.last_name}' 
     
     
-    # @property
-    def get_non_justify(self, month, year):
-        self_non_justify = Absence.objects.filter( student = self ,status = 'غير مبرر', dateTime__year = year, dateTime__month=month).count()
-        return self_non_justify
+    def get_non_justify(self, year, month):
+        start_date = datetime(year, month, 1)
+        if month == 12:
+            end_date = datetime(year + 1, 1, 1)
+        else:
+            end_date = datetime(year, month + 1, 1)
+
+        return Absence.objects.filter(
+            student=self,
+            status="غير مبرر",
+            dateTime__gte=start_date,
+            dateTime__lt=end_date
+        ).count()
+        
 
 
 class Staff(models.Model):
