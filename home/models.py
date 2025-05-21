@@ -64,7 +64,7 @@ class Student(models.Model):
         return f'{self.first_name} {self.last_name}' 
     
     
-    @property
+    # @property
     def get_non_justify(self, month, year):
         self_non_justify = Absence.objects.filter( student = self ,status = 'غير مبرر', dateTime__year = year, dateTime__month=month).count()
         return self_non_justify

@@ -566,8 +566,6 @@ def studentAbsence(request, id):
 # الدالة الخاصة بعرض الغياب الإجمالي للتلميذ
 @allowed_user(allowed_roles=['general_surveillance', 'admin'])
 def studentTotalAbsence(request, id):
-    send_message = None
-    whatsapp_url = None
     user = request.user
     user_info = UserProfile.objects.get(user = user)
     student = Student.objects.get(id = id)
@@ -590,7 +588,12 @@ def studentTotalAbsence(request, id):
             totalAbsences += len(absences )
             monthCount[year][month] = len(absences)
         yearCount[year] = totalAbsences
-    
+    absence_data = {}  
+    for year, months in grouped_absence.items():
+        absence_data[year] = {}
+        for month in months.keys():
+            absence_data[year][month] = student.get_non_justify(year, month)
+
     month = time_zone.now().month
     year = time_zone.now().year
     monthly_absences = absences_qs.filter(month=month, year=year)
@@ -599,8 +602,7 @@ def studentTotalAbsence(request, id):
 
 
     context = {
-        'send_message' : send_message,
-        'whatsapp_url' : whatsapp_url,
+        'absence_data' : absence_data,
         'yearCount' : yearCount,
         'monthCount' : monthCount,
         'user_info' : user_info,
