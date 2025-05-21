@@ -112,8 +112,32 @@ document.querySelectorAll('.send-whatsapp-message').forEach(button => {
         const phone = this.dataset.phone.trim();
 
 
-        message =   `ولي أمر التلميذ(ة) ${fullName}،\n نحيطكم علماً أن مجموع غياب ابنكم (ابنتكم) خلال شهر  ${month} من  هذا الموسم الدراسي بلغ ${absences} {% if ${nonJustify} %} (غياب) منها ${nonJustify} {% endif %} غياب غير مبرر يرجى التواصل مع الإدارة لمزيد من التفاصيل.\n`
+        let message =   `ولي أمر التلميذ(ة) ${fullName}،\n نحيطكم علماً أن مجموع غياب ابنكم (ابنتكم) خلال شهر  ${month} من  هذا الموسم الدراسي `
+        if (absences == 1){
+            message +=  `بلغ غيابا واحدا.`
+        }
+        else if (absences == 2){
+            message+= `بلغ غيابين اثنين.`
+        }
+        else{
+            message += `${absences} (غياب).`
+        }
+        if (nonJustify > 0){
+            if (nonJustify == 1 ){
+                            message = message + `منها  غياب غير مبرر،`
 
+            }
+            else if  (nonJustify == 2 ){
+                            message = message + `منها غيابان غير مبررين،`
+
+            }
+            else{
+            message = message + `منها ${nonJustify} (غياب) غير مبرر،`
+            }
+        }
+  
+            message = message + `\nيرجى التواصل مع الإدارة لمزيد من التفاصيل.`
+     
         const encoded = encodeURIComponent(message);
         const whatsapp_url = `https://wa.me/212${phone}?text=${encoded}`;
         window.open(whatsapp_url, '_blank');
