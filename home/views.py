@@ -616,47 +616,76 @@ def studentTotalAbsence(request, id):
     return render(request, 'pages/attendance/absence/studentTotalAbsence.html', context)
 
 
-
 @allowed_user(allowed_roles=['general_surveillance', 'admin'])
 def ClassTotalAbsence(request, id):
-    user = request.user
-    user_info = UserProfile.objects.get(user=user)
+    # 1. الحصول على بيانات القسم والطلاب
     section = Section.objects.get(id=id)
-    students = Student.objects.filter(sections=section)
+    students = Student.objects.filter(sections=section).order_by('last_name', 'first_name')
     
-    grouped_absence = defaultdict(lambda: defaultdict(lambda: defaultdict(lambda: defaultdict(lambda: defaultdict(str)))))
-
-    for s in students:
-        absences = Absence.objects.filter(student=s).annotate(
-            year=ExtractYear('dateTime'),
-            month=ExtractMonth('dateTime'),
-            week=ExtractWeek('dateTime'),
-            day=ExtractDay('dateTime'),
+    # 2. تهيئة هيكل البيانات
+    absence_data = defaultdict(
+        lambda: defaultdict(
+            lambda: defaultdict(
+                lambda: defaultdict(
+                    lambda: defaultdict(bool)
+                )
+            )
         )
+    )
 
-        for absence in absences:
-            y = absence.year
-            m = absence.month
-            w = absence.week
-            d = absence.day
-            h = absence.absenceHours.id
-            grouped_absence[s][y][m][w][d, h] = 'X'
+    # 3. جلب بيانات الغياب مع تحسين الأداء
+    absences = Absence.objects.filter(
+        student__in=students
+    ).annotate(
+        year=ExtractYear('dateTime'),
+        month=ExtractMonth('dateTime'),
+        week=ExtractWeek('dateTime'),
+        day=ExtractDay('dateTime'),
+    ).select_related('student', 'absenceHours')
 
-    current_year = time_zone.now().year
-    recent_years = list(range(current_year - 4, current_year + 1))
+    # 4. تجميع بيانات الغياب
+    for absence in absences:
+        absence_data[absence.student][absence.year][absence.month][absence.week][absence.day][absence.absenceHours.id] = True
 
-    all_days = {m: list(range(1, calendar.monthrange(current_year, m)[1] + 1)) for m in range(1, 13)}
-    hours_range = range(1, 9)  # الحصص من 1 إلى 8
+    # 5. تحضير بيانات الأسابيع والأيام
+    years_data = {}
+    current_year = timezone.now().year
+    
+    for year in sorted(set(a.year for a in absences), reverse=True):
+        months_data = {}
+        
+        for month in range(1, 13):
+            weeks_data = {}
+            month_days = calendar.monthrange(year, month)[1]
+            
+            for day in range(1, month_days + 1):
+                week_num = date(year, month, day).isocalendar()[1]
+                if week_num not in weeks_data:
+                    weeks_data[week_num] = []
+                weeks_data[week_num].append(day)
+            
+            if weeks_data:  # فقط إذا كان هناك أيام في الشهر
+                months_data[month] = {
+                    'name': calendar.month_name[month],
+                    'weeks': weeks_data
+                }
+        
+        if months_data:  # فقط إذا كان هناك أشهر تحتوي على بيانات
+            years_data[year] = {
+                'months': months_data,
+                'is_current': year == current_year
+            }
 
+    # 6. إعداد البيانات للقالب
     context = {
         'section': section,
-        'user_info': user_info,
         'students': students,
-        'grouped_absence': grouped_absence,
-        'years': recent_years,
-        'days_by_month': all_days,
-        'hours_range': hours_range,
+        'absence_data': absence_data,
+        'years_data': years_data,
+        'hours_range': range(1, 9),  # الحصص من 1 إلى 8
+        'current_year': current_year,
     }
+    
     return render(request, 'pages/attendance/absence/ClassTotalAbsence.html', context)
 
 # الدالة الخاصة بعرض وإضافة التقارير

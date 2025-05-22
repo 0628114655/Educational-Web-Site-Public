@@ -1,80 +1,95 @@
 {% extends 'base.html' %}
 {% load static %}
-{% load custom_filter %}
+{% load custom_filters %}
+
 {% block content %}
-
 <div class="container-fluid my-5">
-    {% if messages %}
-        {% for message in messages %}
-            <div class="alert alert-{{ message.tags }}">
-                {{ message }}
-            </div>
-        {% endfor %}
-    {% endif %}
-
+    <!-- زر الرجوع -->
     <div class="mb-3 text-start">
-        <a href="{% url 'classes' %}" class="text-decoration-none" style="color: inherit; font-size: 0.9rem;">
-            <i class="fas fa-arrow-circle-left me-1"></i> الرجوع للصفحة السابقة
+        <a href="{% url 'classes' %}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-circle-left me-1"></i> الرجوع
         </a>
     </div>
 
-    <h4 class="text-info text-center">سجل الغياب الشهري للقسم: {{ section.name }}</h4>
+    <!-- عنوان الصفحة -->
+    <h3 class="text-center mb-4">سجل الغياب الشهري: {{ section.name }}</h3>
 
-  {% for year in years %}
-    <div class="card my-3">
-      <div class="card-header bg-primary text-white">السنة: {{ year }}</div>
-      <div class="card-body">
-
-        {% for month, days in days_by_month.items %}
-          <div class="card my-2">
-            <div class="card-header bg-secondary text-white">الشهر: {{ month }}</div>
-            <div class="card-body">
-
-              {% for week in 1|to_range:5 %}
-                <h6>الأسبوع {{ week }}</h6>
-                <table class="table table-bordered text-center">
-                  <thead>
-                    <tr>
-                      <th>الاسم</th>
-                      {% for d in days %}
-                        <th colspan="8">{{ d }}</th>
-                      {% endfor %}
-                    </tr>
-                    <tr>
-                      <th></th>
-                      {% for d in days %}
-                        {% for h in hours_range %}
-                          <th>{{ h }}</th>
-                        {% endfor %}
-                      {% endfor %}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {% for s in students %}
-                      <tr>
-                        <td>{{ s.first_name }} {{ s.last_name }}</td>
-                        {% for d in days %}
-                          {% for h in hours_range %}
-                            <td>
-                              {% if grouped_absence|get_item:s|get_item:year|get_item:month|get_item:week|get_item:(d,h) %}
-                                X
-                              {% endif %}
-                            </td>
-                          {% endfor %}
-                        {% endfor %}
-                      </tr>
-                    {% endfor %}
-                  </tbody>
-                </table>
-              {% endfor %}
-              
-            </div>
-          </div>
-        {% endfor %}
+    <!-- عرض البيانات حسب السنوات -->
+    {% for year, year_data in years_data.items %}
+    <div class="card mb-4">
+        <div class="card-header {% if year_data.is_current %}bg-primary{% else %}bg-info{% endif %} text-white">
+            <h4>السنة الدراسية: {{ year }}</h4>
+        </div>
         
-      </div>
+        <div class="card-body">
+            <!-- عرض البيانات حسب الأشهر -->
+            {% for month, month_data in year_data.months.items %}
+            <div class="card mb-3">
+                <div class="card-header bg-secondary text-white">
+                    <h5>شهر {{ month_data.name }}</h5>
+                </div>
+                
+                <div class="card-body">
+                    <!-- عرض البيانات حسب الأسابيع -->
+                    {% for week, days in month_data.weeks.items %}
+                    <div class="week-section mb-4 p-3 border rounded">
+                        <h6 class="text-muted mb-3">الأسبوع {{ week }}</h6>
+                        
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-hover text-center">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th rowspan="2" style="width: 15%;">اسم الطالب</th>
+                                        {% for day in days %}
+                                        <th colspan="{{ hours_range|length }}">{{ day }}/{{ month }}/{{ year }}</th>
+                                        {% endfor %}
+                                    </tr>
+                                    <tr>
+                                        {% for day in days %}
+                                            {% for hour in hours_range %}
+                                            <th>{{ hour }}</th>
+                                            {% endfor %}
+                                        {% endfor %}
+                                    </tr>
+                                </thead>
+                                
+                                <tbody>
+                                    {% for student in students %}
+                                    <tr>
+                                        <td class="text-nowrap">{{ student.full_name }}</td>
+                                        {% for day in days %}
+                                            {% for hour in hours_range %}
+                                            <td class="{% if absence_data|get_item:student|get_item:year|get_item:month|get_item:week|get_item:day|get_item:hour %}bg-danger text-white{% endif %}">
+                                                {% if absence_data|get_item:student|get_item:year|get_item:month|get_item:week|get_item:day|get_item:hour %}✔{% endif %}
+                                            </td>
+                                            {% endfor %}
+                                        {% endfor %}
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
     </div>
-  {% endfor %}
-
+    {% endfor %}
 </div>
+
+<style>
+    .week-section {
+        background-color: #f8f9fa;
+        margin-bottom: 20px;
+    }
+    th {
+        white-space: nowrap;
+        vertical-align: middle;
+    }
+    .table-responsive {
+        overflow-x: auto;
+    }
+</style>
 {% endblock %}
