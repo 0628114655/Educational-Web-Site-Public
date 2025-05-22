@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
-{% load custom_filters %}
+{% load custom_filter %}
 
 {% block content %}
 <div class="container-fluid my-5">
@@ -59,8 +59,8 @@
                                         <td class="text-nowrap">{{ student.full_name }}</td>
                                         {% for day in days %}
                                             {% for hour in hours_range %}
-                                            <td class="{% if absence_data|get_item:student|get_item:year|get_item:month|get_item:week|get_item:day|get_item:hour %}bg-danger text-white{% endif %}">
-                                                {% if absence_data|get_item:student|get_item:year|get_item:month|get_item:week|get_item:day|get_item:hour %}✔{% endif %}
+                                            <td class="{% if absence_data|get_item:student|get_item:year|get_item:month|get_item:week|get_item:day|get_item:hour %}{% endif %}">
+                                                {% if absence_data|get_item:student|get_item:year|get_item:month|get_item:week|get_item:day|get_item:hour %}X{% endif %}
                                             </td>
                                             {% endfor %}
                                         {% endfor %}

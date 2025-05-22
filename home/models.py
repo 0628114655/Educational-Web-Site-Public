@@ -58,8 +58,8 @@ class Student(models.Model):
     first_name = models.CharField(max_length = 50)
     last_name = models.CharField(max_length = 50)
     sections = models.ForeignKey(Section, related_name="students", blank = True, null = True, on_delete = models.SET_NULL)
-    number_phone = models.CharField(max_length = 14, default = 0000)
-    parentEmail = models.EmailField(null=True)
+    number_phone = models.CharField(max_length = 14, null = True, blank = True)
+    parentEmail = models.EmailField(null=True, blank = True)
     def __str__(self):
         return f'{self.first_name} {self.last_name}' 
     
