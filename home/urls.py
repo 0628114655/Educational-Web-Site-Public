@@ -19,8 +19,6 @@ urlpatterns=[
     path('studentAbsence/<int:id>', views.studentAbsence, name = 'studentAbsence'),
     # الصفحة الخاصة بتبيرالغياب الإجمالي للتلميذ
     path('studentTotalAbsence/<int:id>', views.studentTotalAbsence, name = 'studentTotalAbsence'),
-    # الصفحة الخاصة بتدبير الغياب الجماعي للأقسام
-    path('ClassTotalAbsence/<int:id>', views.ClassTotalAbsence, name = 'ClassTotalAbsence'),
 
     # صفحة خاصة بإضافة تقارير 
     path('add_reports/<int:id>', views.add_reports, name = 'add_reports'),

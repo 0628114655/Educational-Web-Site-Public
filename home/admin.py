@@ -13,6 +13,10 @@ class StaffAdmin(ImportExportModelAdmin):
     list_display = ('FirstName', 'LastName', 'Email', 'PPR')
     search_fields = ['FirstName', 'LastName']
 
+class AbsenceAdmin(ImportExportModelAdmin):
+    list_display = ('student', 'absenceHours', 'section', 'counter')
+    search_fields = ['student', 'section']
+
 
 # Register your models here.
 admin.site.register(Student, StudentAdmin)
@@ -29,7 +33,7 @@ admin.site.register(Subject)
 admin.site.register(ExamCorrection)
 admin.site.register(Classe)
 admin.site.register(Files)
-admin.site.register(Absence)
+admin.site.register(Absence, AbsenceAdmin)
 admin.site.register(Report)
 admin.site.register(Activities)
 

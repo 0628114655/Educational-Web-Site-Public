@@ -217,7 +217,7 @@ class Hour(models.Model):
 class Absence(models.Model):
     status_choices = [('مبرر', 'مبرر'), ('غير مبرر', 'غير مبرر')]
     student = models.ForeignKey(Student, on_delete = models.CASCADE)
-    notes = models.CharField(max_length=200)
+    notes = models.CharField(max_length=200, default = 'بدون')
     status = models.CharField(max_length=15, choices=status_choices)
     absenceHours = models.ForeignKey(Hour, on_delete=models.CASCADE)
     section = models.ForeignKey(Section, on_delete=models.CASCADE, null = True, blank=True)
