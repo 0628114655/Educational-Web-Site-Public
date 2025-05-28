@@ -34,7 +34,9 @@
         </center>
     {% endif %}
 
-
+<br>
+<br>
+<br>
     {% if 'admin' in request.user.groups.all|join:", " or 'teacher' in request.user.groups.all|join:"," or 'general_surveillance' in request.user.groups.all|join:"," %}
         <a href="{% url 'add_course' %}" class="text-info m-4" style="font-size:larger">لإضافة درس اضغط هنا </a>
         <a href="{% url 'course_res' %}" class="text-info m-4" style="font-size:larger"> البحث عن درس </a>

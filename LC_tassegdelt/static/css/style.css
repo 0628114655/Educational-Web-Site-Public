@@ -3,7 +3,7 @@ body {
     color: #2f2d2d;
     position: relative;
     font-size: large;
-    font-family: 'Tajawal' , 'Gupter', 'Marhey', sans-serif;
+    font-family: 'Tajawal' , 'Gupter', 'Marhey', sans-serif !important;
     direction: rtl;
     text-align: right;
 }
