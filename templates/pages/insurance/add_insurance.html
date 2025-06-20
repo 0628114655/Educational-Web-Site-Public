@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+
+
+{% block content %}
+
+<div class="container-fluid w-75">
+  <center class="text-dark "><h4>لوائح التأمين</h4></center>
+  <div class="m-5 p-2">
+        <form method="post" id="insuranceForm" >
+            {% csrf_token %}
+            
+            {% if not insurance_num %}
+                <input type="number" name="primary_number" id="primary_number" placeholder="رقم التأمين الابتدائي">
+            {% endif %}
+
+            <input type="text" name="student" placeholder="اسم التلميذ" id="student" required>
+            <button type="submit">إضافة</button>
+        </form>
+        <div id="response"></div>
+    </div>
+  
+  <a href="{% url 'insurance_list_export' %}">تصدير اللوائح</a>
+</div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+  $("#insuranceForm").on("submit", function(e) {
+    e.preventDefault();
+
+    $.ajax({
+      type: "POST",
+      url: "",  // نفس الرابط الحالي
+      data: $(this).serialize(),
+      success: function(response) {
+        if (response.status === "success") {
+          $("#response").html(response.message + ': ' + response.number);
+          $('#student').val('');
+          $('#primary_number').addClass('hidden');
+          $('#primary_number').val('');
+        } else {
+          $("#response").html("خطأ: " + response.message);
+        }
+      },
+      error: function() {
+        $("#response").html("حدث خطأ غير متوقع.");
+      }
+    });
+  });
+</script>
+
+{% endblock %}

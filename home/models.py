@@ -58,8 +58,8 @@ class Student(models.Model):
     first_name = models.CharField(max_length = 50)
     last_name = models.CharField(max_length = 50)
     sections = models.ForeignKey(Section, related_name="students", blank = True, null = True, on_delete = models.SET_NULL)
-    number_phone = models.CharField(max_length = 14, default = 0000)
-    parentEmail = models.EmailField(null=True)
+    number_phone = models.CharField(max_length = 14, null = True, blank = True)
+    parentEmail = models.EmailField(null=True, blank = True)
     def __str__(self):
         return f'{self.first_name} {self.last_name}' 
     
@@ -77,8 +77,6 @@ class Student(models.Model):
             dateTime__gte=start_date,
             dateTime__lt=end_date
         ).count()
-        
-
 
 class Staff(models.Model):
     choices =  [('أستاذ', 'أستاذ'), ('حارس عام', 'حارس عام'), ('مشرف', 'مشرف')]
@@ -217,7 +215,7 @@ class Hour(models.Model):
 class Absence(models.Model):
     status_choices = [('مبرر', 'مبرر'), ('غير مبرر', 'غير مبرر')]
     student = models.ForeignKey(Student, on_delete = models.CASCADE)
-    notes = models.CharField(max_length=200)
+    notes = models.CharField(max_length=200, default = 'بدون')
     status = models.CharField(max_length=15, choices=status_choices)
     absenceHours = models.ForeignKey(Hour, on_delete=models.CASCADE)
     section = models.ForeignKey(Section, on_delete=models.CASCADE, null = True, blank=True)
@@ -236,3 +234,11 @@ class Absence(models.Model):
     class Meta:
         ordering = ['-dateTime']
 
+class Insurance_number(models.Model):
+    Number = models.IntegerField(null = True, blank=True)
+    FirstName = models.CharField(max_length=50, null = True, blank=True)
+    LastName = models.CharField(max_length=50, null = True, blank=True)
+    MassarCode = models.CharField(max_length=50, null = True, blank=True)
+    date = models.DateField(null = True)
+    def __str__(self):
+        return f'The insurance number [{self.Number}] of the student: {self.FirstName} {self.LastName}'

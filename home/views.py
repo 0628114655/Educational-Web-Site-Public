@@ -3,20 +3,18 @@ from django.http import HttpResponse, JsonResponse
 from .models import *
 from .forms import *
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.hashers import make_password
 from django.utils import timezone as time_zone 
 from .decorator import allowed_user
 from django.forms import modelformset_factory
 from django.contrib.auth.models import Group
 from django.contrib import messages
-from django.db.models.functions import ExtractYear, ExtractMonth, ExtractDay, ExtractWeek, ExtractHour
-from collections import defaultdict
+from django.db.models.functions import ExtractYear, ExtractMonth
 from django.core.mail import send_mail
-from django.conf import settings
 import urllib.parse
-from collections import defaultdict
-import calendar
+from .resources import InsuranceNumberResource
+from tablib import Dataset
 import datetime
+
 
 
 
@@ -38,6 +36,107 @@ def home (request):
     }
     return render (request,'pages/home.html', context)
 
+# إضافة أرقام للتأمين
+def add_insurance(request):
+    user = request.user
+    user_info = user
+    date = time_zone.now().date()
+    insurance_num = Insurance_number.objects.filter(date__year=date.year, Number__isnull = False)
+    if request.method == 'POST':
+        student = request.POST.get('student')
+        if not student in ['مغادر', 'ملغى']:
+            FirstName = student.split(' ')[0]
+            LastName = student.split(' ')[1]
+            primary_number = request.POST.get('primary_number')
+
+            last_number = Insurance_number.objects.order_by('-Number').first()
+            if last_number and last_number.Number:
+                insurance_number = last_number.Number + 1
+            else:
+                if not primary_number:
+                    return JsonResponse({'status': 'error', "message": 'المرجو إدخال رقم التأمين الابتدائي'})
+                try:
+                    insurance_number = int(primary_number)
+                except ValueError:
+                    return JsonResponse({'status': 'error', 'message': 'رقم التأمين غير صالح'})
+            try:
+                x = Insurance_number.objects.get(FirstName = FirstName, LastName = LastName)
+                x.Number = insurance_number
+                x.date = date
+                x.save()
+                return JsonResponse({'status': 'success', 'message': 'تمت إضافة رقم التأمين بنجاح', 'number': insurance_number})
+            except:
+                Insurance_number.objects.create(
+                    Number=insurance_number,
+                    FirstName=FirstName,
+                    LastName=LastName,
+                    date=date
+                )
+
+                return JsonResponse({'status': 'success', 'message': 'تمت إضافة التلميذ بنجاح', 'number': insurance_number})
+        else:
+            primary_number = request.POST.get('primary_number')
+            last_number = Insurance_number.objects.order_by('-Number').first()
+
+            if last_number.Number:
+                insurance_number = last_number.Number + 1
+            else:
+                if not primary_number:
+                    return JsonResponse({'status': 'error', "message": 'المرجو إدخال رقم التأمين الابتدائي'})
+                try:
+                    insurance_number = int(primary_number)
+                except ValueError:
+                    return JsonResponse({'status': 'error', 'message': 'رقم التأمين غير صالح'})
+            if student == 'ملغى':
+                Insurance_number.objects.create(
+                        Number=insurance_number,
+                        FirstName= 'ملغى',
+                        LastName= 'ملغى',
+                        date=date
+                    )
+                return JsonResponse({'status': 'success', 'message': 'تم تجاوز الرقم الملغى بنجاح', 'number': insurance_number})
+            else:
+                Insurance_number.objects.create(
+                        Number=insurance_number,
+                        FirstName= 'مغادر',
+                        LastName= 'مغادر',
+                        date=date
+                    )
+                return JsonResponse({'status': 'success', 'message': 'تم تجاوز رقم التلميذ المغادر بنجاح', 'number': insurance_number})
+
+
+    context = {
+        'insurance_num': insurance_num,
+        'user_info': user_info,
+    }
+    return render(request, 'pages/insurance/add_insurance.html', context)
+
+# تصدير لوائح التأمين
+def insurance_list_export(request):
+    year = time_zone.now().year
+    insurance_list = Insurance_number.objects.filter(date__year = year)
+    for item in insurance_list:
+        if item.FirstName in ['مغادر','ملغى'] or item.LastName in ['مغادر','ملغى']:
+            # item = get_object_or_404(Insurance_number, id = item.id)
+            item.delete()
+        elif not item.Number:
+            # item = get_object_or_404(Insurance_number, id = item.id)
+            item.delete()
+    resource = InsuranceNumberResource()
+    dataset = resource.export()
+    response = HttpResponse(
+        dataset.xlsx,
+        content_type = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' 
+    )
+    today = datetime.date.today()
+    response['content_desposition'] = f"attachement; filename='insurance_list_{today}'"
+    return response
+    # return JsonResponse({'status': 'success', 'message': 'لقد تم تصدير لوائح التأمين بنجاح.' })
+
+    #  context = {
+        
+    # }
+    # return render(request, 'pages/insurance/add_insurance.html', context)
 # الصفحة الخاصة بإضافة نشاط
 @allowed_user(allowed_roles = ['admin', 'general_surveillance'])
 def add_activity (request): 
@@ -602,8 +701,6 @@ def studentTotalAbsence(request, id):
     monthly_absences = absences_qs.filter(month=month, year=year)
     month_absences = monthly_absences.count()
     month = ARABIC_MONTHS[month]
-
-
     context = {
         'absence_data' : absence_data,
         'yearCount' : yearCount,
@@ -611,82 +708,8 @@ def studentTotalAbsence(request, id):
         'user_info' : user_info,
         'student' : student,
         'grouped_absence' : dict(grouped_absence), 
-        'month_absences' : month_absences
-    }
+        'month_absences' : month_absences}
     return render(request, 'pages/attendance/absence/studentTotalAbsence.html', context)
-
-
-@allowed_user(allowed_roles=['general_surveillance', 'admin'])
-def ClassTotalAbsence(request, id):
-    # 1. الحصول على بيانات القسم والطلاب
-    section = Section.objects.get(id=id)
-    students = Student.objects.filter(sections=section).order_by('last_name', 'first_name')
-    
-    # 2. تهيئة هيكل البيانات
-    absence_data = defaultdict(
-        lambda: defaultdict(
-            lambda: defaultdict(
-                lambda: defaultdict(
-                    lambda: defaultdict(bool)
-                )
-            )
-        )
-    )
-
-    # 3. جلب بيانات الغياب مع تحسين الأداء
-    absences = Absence.objects.filter(
-        student__in=students
-    ).annotate(
-        year=ExtractYear('dateTime'),
-        month=ExtractMonth('dateTime'),
-        week=ExtractWeek('dateTime'),
-        day=ExtractDay('dateTime'),
-    ).select_related('student', 'absenceHours')
-
-    # 4. تجميع بيانات الغياب
-    for absence in absences:
-        absence_data[absence.student][absence.year][absence.month][absence.week][absence.day][absence.absenceHours.id] = True
-
-    # 5. تحضير بيانات الأسابيع والأيام
-    years_data = {}
-    current_year = timezone.now().year
-    
-    for year in sorted(set(a.year for a in absences), reverse=True):
-        months_data = {}
-        
-        for month in range(1, 13):
-            weeks_data = {}
-            month_days = calendar.monthrange(year, month)[1]
-            
-            for day in range(1, month_days + 1):
-                week_num = date(year, month, day).isocalendar()[1]
-                if week_num not in weeks_data:
-                    weeks_data[week_num] = []
-                weeks_data[week_num].append(day)
-            
-            if weeks_data:  # فقط إذا كان هناك أيام في الشهر
-                months_data[month] = {
-                    'name': calendar.month_name[month],
-                    'weeks': weeks_data
-                }
-        
-        if months_data:  # فقط إذا كان هناك أشهر تحتوي على بيانات
-            years_data[year] = {
-                'months': months_data,
-                'is_current': year == current_year
-            }
-
-    # 6. إعداد البيانات للقالب
-    context = {
-        'section': section,
-        'students': students,
-        'absence_data': absence_data,
-        'years_data': years_data,
-        'hours_range': range(1, 9),  # الحصص من 1 إلى 8
-        'current_year': current_year,
-    }
-    
-    return render(request, 'pages/attendance/absence/ClassTotalAbsence.html', context)
 
 # الدالة الخاصة بعرض وإضافة التقارير
 @allowed_user(allowed_roles=['general_surveillance', 'admin'])
