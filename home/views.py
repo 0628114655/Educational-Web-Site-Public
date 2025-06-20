@@ -117,10 +117,8 @@ def insurance_list_export(request):
     insurance_list = Insurance_number.objects.filter(date__year = year)
     for item in insurance_list:
         if item.FirstName in ['مغادر','ملغى'] or item.LastName in ['مغادر','ملغى']:
-            # item = get_object_or_404(Insurance_number, id = item.id)
             item.delete()
         elif not item.Number:
-            # item = get_object_or_404(Insurance_number, id = item.id)
             item.delete()
     resource = InsuranceNumberResource()
     dataset = resource.export()

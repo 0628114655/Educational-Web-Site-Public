@@ -5,22 +5,30 @@
 {% block content %}
 
 <div class="container-fluid w-75">
-  <center class="text-dark "><h4>لوائح التأمين</h4></center>
-  <div class="m-5 p-2">
-        <form method="post" id="insuranceForm" >
-            {% csrf_token %}
-            
-            {% if not insurance_num %}
-                <input type="number" name="primary_number" id="primary_number" placeholder="رقم التأمين الابتدائي">
-            {% endif %}
+  <div class="insurance-form">
+    <center class="text-info"> <h4> لوائح التأمين </h4></center>
+    <div class="m-5 p-2">
+          <form method="post" id="insuranceForm" >
+              {% csrf_token %}
+              
+              {% if not insurance_num %}
+                  <input type="number" name="primary_number" id="primary_number" placeholder="رقم التأمين الابتدائي">
+              {% endif %}
 
-            <input type="text" name="student" placeholder="اسم التلميذ" id="student" required>
-            <button type="submit">إضافة</button>
-        </form>
-        <div id="response"></div>
+              <input type="text" name="student" placeholder="اسم التلميذ" id="student" required>
+              <button type="submit">إضافة</button>
+          </form>
+          <div id="response"></div>
     </div>
-  
-  <a href="{% url 'insurance_list_export' %}">تصدير اللوائح</a>
+    <a href="{% url 'insurance_list_export' %}" class="mx-3 text-info">تصدير لوائح التأمين</a>
+    <a href="{% url 'insurance_list_export' %}" class="mx-3 text-info">تحميل سجل مراقبة الخارج عن الميزانية</a>
+  </div>
+  <div class="Off-budget control">
+    <form action="" method="post">
+      {% csrf_token %}
+
+    </form>
+  </div>
 </div>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>

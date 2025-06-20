@@ -77,7 +77,6 @@ class UserLoginForm(forms.Form):
                 raise forms.ValidationError(' رمز مسار/رقم التأجير أو كلمة المرور غير صحيحة.')
             return super(UserLoginForm, self).clean(*args, **kwargs)
 
-
 class Add_announce(forms.ModelForm):
     title = forms.CharField( label= 'عنوان الإعلان' ,widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder' : ' عنوان الإعلان ..' }))
     content = forms.CharField( label= 'محتوى الإعلان' ,widget=forms.Textarea(attrs={'class': 'form-control', 'placeholder' : 'اكتب محتوى الإعلان هنا ..'}),)
@@ -196,5 +195,7 @@ class Add_activity(forms.ModelForm):
         model = Activities
         fields = ['title', 'dateTime', 'content']
 
-
-
+class OffBudgetControl(forms.Form):
+    Departures = forms.CharField(label='أسماء التلاميذ المغادرين: (الاسم الشخصي الاسم العائلي - الاسم الشخصي الاسم العائلي ...)', widget=forms.TextInput(attrs={'class' : 'form-control'}))
+    ASS = forms.DecimalField(label='المبلغ المستخلص بالجمعية الرياضية', widget=forms.NumberInput(attrs={'class' : 'form-control'}))
+    HalfAmmount = forms.CharField(label='ضع أسماء التلاميذ الذين أدوا نصف مبلغ الجمعية الرياضية: (الاسم الشخصي الاسم العائلي - الاسم الشخصي الاسم العائلي ...)', widget=forms.TextInput(attrs={"class": "form-control"}))

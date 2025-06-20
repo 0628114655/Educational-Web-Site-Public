@@ -18,11 +18,7 @@ class StaffAdmin(ImportExportModelAdmin):
     search_fields = ['FirstName', 'LastName']
 
 class AbsenceAdmin(ImportExportModelAdmin):
-<<<<<<< HEAD
-    list_display = ('student', 'status', 'absenceHours', 'section', 'dateTime', 'counter')
-=======
     list_display = ('student', 'absenceHours', 'section', 'counter')
->>>>>>> a3a39f038fe874cf132da711fb9ddc76c29deb39
     search_fields = ['student', 'section']
 
 
