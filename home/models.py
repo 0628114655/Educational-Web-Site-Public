@@ -77,8 +77,6 @@ class Student(models.Model):
             dateTime__gte=start_date,
             dateTime__lt=end_date
         ).count()
-        
-
 
 class Staff(models.Model):
     choices =  [('أستاذ', 'أستاذ'), ('حارس عام', 'حارس عام'), ('مشرف', 'مشرف')]
@@ -236,3 +234,11 @@ class Absence(models.Model):
     class Meta:
         ordering = ['-dateTime']
 
+class Insurance_number(models.Model):
+    Number = models.IntegerField(null = True, blank=True)
+    FirstName = models.CharField(max_length=50, null = True, blank=True)
+    LastName = models.CharField(max_length=50, null = True, blank=True)
+    MassarCode = models.CharField(max_length=50, null = True, blank=True)
+    date = models.DateField(null = True)
+    def __str__(self):
+        return f'The insurance number [{self.Number}] of the student: {self.FirstName} {self.LastName}'

@@ -29,6 +29,11 @@ urlpatterns=[
     # الدالة الخاصة بعرض الأنشطة
     path('ShowActivities/', views.ShowActivities, name = 'ShowActivities'),
 
+    # التأمين المدرسي
+    path('add_insurance/', views.add_insurance, name = 'add_insurance'),
+    path('insurance_list_export/', views.insurance_list_export, name = 'insurance_list_export'),
+
+
 
     path('Update/<int:id>/', views.Update, name = 'Update'),
     path('Delete/<int:id>/', views.Delete, name = 'Delete'),

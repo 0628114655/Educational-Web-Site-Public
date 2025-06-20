@@ -27,6 +27,8 @@
                 <li class="nav-item {% if request.resolver_match.url_name == 'homeWork' or request.resolver_match.url_name == 'UserHomeWorkList' or request.resolver_match.url_name == 'HomeWorkView' %} active {% endif %}"><a href=" {% if 'student' in request.user.groups.all|join:',' %} {% url 'homeWork' %} {% else %} {% url 'UserHomeWorkList' %} {% endif %} " class="nav-link seasonsDropdown"> الواجبات الدراسية</a></li>
                 {% endif %}
 
+                <li class="nav-item {% if request.path == '/add_insurance/' %} active {% endif %}"><a href="{% url 'add_insurance' %}" class="nav-link seasonsDropdown">  التأمين المدرسي</a></li>
+
                 <!-- الصفحات المشتركة -->
                 <li class="nav-item {% if request.path == '/signup/' %} active {% endif %}"><a href="{% url 'signup' %}" class="nav-link sign">الاشتراك </a></li>
                 <li class="nav-item {% if request.path == '/signin/' %} active {% endif %}"><a href="{% url 'signin' %}" class="nav-link sign"> تسجيل الدخول </a></li>
