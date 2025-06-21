@@ -128,13 +128,23 @@ def insurance_list_export(request):
     )
     today = datetime.date.today()
     response['content_desposition'] = f"attachement; filename='insurance_list_{today}'"
-    return response
-    # return JsonResponse({'status': 'success', 'message': 'لقد تم تصدير لوائح التأمين بنجاح.' })
+    return response  
 
-    #  context = {
-        
-    # }
-    # return render(request, 'pages/insurance/add_insurance.html', context)
+def offBudgetControl(request):
+    names = []
+    form = OffBudgetControl(request.POST or None)
+    if form.is_valid:
+        departures = form.cleaned_data.get('Departures')
+        names = departures.split(',')
+        print(names)
+
+    OBCR = Insurance_number.objects.all().annotate(Additional_fees = 10.00 )
+    
+    context =   {
+        'form' : form
+    }
+    return render(request, 'pages/insurance/add_insurance.html', context)
+
 # الصفحة الخاصة بإضافة نشاط
 @allowed_user(allowed_roles = ['admin', 'general_surveillance'])
 def add_activity (request): 
