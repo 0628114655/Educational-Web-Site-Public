@@ -24,11 +24,10 @@
     <a href="#" id="download_button" class="mx-3 text-info">تحميل سجل مراقبة الخارج عن الميزانية</a>
   </div>
   <div class="Off_budget_control hidden"  >
-    <form action="" method="post">
+    <form action="" method="POST">
       {% csrf_token %}
       {{form}}
-      <a href="{% url 'insurance_list_export' %}?data=control"  type="submit" class="btn btn-outline-info">تحميل سجل مراقبة الخارج عن الميزانية</a>
-
+      <button type="submit"  class="btn btn-outline-info">تحميل سجل مراقبة الخارج عن الميزانية</button>
     </form>
   </div>
 </div>

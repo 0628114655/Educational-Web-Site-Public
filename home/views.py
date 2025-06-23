@@ -11,9 +11,10 @@ from django.contrib import messages
 from django.db.models.functions import ExtractYear, ExtractMonth
 from django.core.mail import send_mail
 import urllib.parse
-from .resources import InsuranceNumberResource
+from .resources import *
 from tablib import Dataset
 import datetime
+from django.db.models import Q
 
 
 
@@ -41,11 +42,11 @@ def add_insurance(request):
     user = request.user
     user_info = user
     date = time_zone.now().date()
+    year = time_zone.now().year
     insurance_num = Insurance_number.objects.filter(date__year=date.year, Number__isnull = False)
-    form = OffBudgetControl()
+    form = OffBudgetControl(request.POST or None)
     if request.method == 'POST':
-        data = request.GET.get('data')
-        if data == 'insurance':
+        try:
             student = request.POST.get('student')
             if not student in ['مغادر', 'ملغى']:
                 FirstName = student.split(' ')[0]
@@ -75,7 +76,6 @@ def add_insurance(request):
                         LastName=LastName,
                         date=date
                     )
-
                     return JsonResponse({'status': 'success', 'message': 'تمت إضافة التلميذ بنجاح', 'number': insurance_number})
             else:
                 primary_number = request.POST.get('primary_number')
@@ -106,57 +106,58 @@ def add_insurance(request):
                             date=date
                         )
                     return JsonResponse({'status': 'success', 'message': 'تم تجاوز رقم التلميذ المغادر بنجاح', 'number': insurance_number})
-        else:
-            depart_list = []
-            half_list = []
-            year = time_zone.now().year
-
-
-            form = OffBudgetControl(request.POST)
+        except:
             if form.is_valid():
                 departures = form.cleaned_data.get('Departures')
-                insurance_fees = form.cleaned_data.get('insurance_fees')
+                Insurance_fees = form.cleaned_data.get('Insurance_fees')
                 sport_ass = form.cleaned_data.get('sport_ass')
                 HalfAmmount = form.cleaned_data.get('HalfAmmount')
-                depart_list = departures.split(',')
-                half_list = HalfAmmount.split(',')
-
-            for obj in Insurance_number.objects.all():
-                obj.Additional_fees = 10.00
-                obj.insurance_fees = insurance_fees
-                obj.sport_ass = sport_ass
-            for name in depart_list:
-                full_name = name.split(' ')
-                Insurance_number.create(
-                    FirstName = full_name[0],
-                    LastName = full_name[1],
-                    Additional_fees = 10.00
-                )
-            for name in half_list:
-                full_name = name.split(' ')
-                x = Insurance_number.objects.get(
-                    FirstName = full_name[0],
-                    LastName = full_name[1],
-                )
-                x.sport_ass = sport_ass/2
-                x.save()
+                depart_list = departures.split(',') if departures else []
+                half_list = HalfAmmount.split(',') if HalfAmmount else []
             
-            insurance_list = x.filter(date__year = year)
-            for item in insurance_list:
-                if item.FirstName in ['مغادر','ملغى'] or item.LastName in ['مغادر','ملغى']:
-                    item.delete()
-                elif not item.Number:
-                    item.delete()
-            resource = insurance_list
-            dataset = resource.export()
-            response = HttpResponse(
-                dataset.xlsx,
-                content_type = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' 
-            )
-            today = datetime.date.today()
-            response['Content-Disposition'] = f"attachement; filename='insurance_list_{today}'"
-            return response  
+                insurance_list = Insurance_number.objects.all()
+                for item in insurance_list:
+                    item.Additional_fees = 10.00
+                    item.Insurance_fees = Insurance_fees
+                    item.sport_ass = sport_ass
+                    item.save()
 
+                for name in depart_list:
+                    full_name = name.split(' ')
+                    Insurance_number.objects.create(
+                        FirstName = full_name[0],
+                        LastName = full_name[1],
+                        Additional_fees = 10.00
+                    )
+                for name in half_list:
+                    full_name = name.split(' ')
+                    try:
+                        x = Insurance_number.objects.get(
+                            FirstName = full_name[0],
+                            LastName = full_name[1],
+                        )
+                        x.sport_ass = sport_ass / 2
+                        x.save()
+                    except:
+                        return JsonResponse ({'error':'الأسماء الواردة بخانة المؤدين لنصف مبلغ الجمعية الرياضية غير موجود بقاعدة البيانات'})
+                
+                insurance_list = Insurance_number.objects.filter(date__year = year).exclude(
+                    Q(FirstName__in=['مغادر', 'ملغى']) |
+                    Q(LastName__in=['مغادر', 'ملغى']) |
+                    Q(Number__isnull=True)
+                    )
+                
+                resource = OffBudgetControlResource()
+                dataset = resource.export(insurance_list)
+                response = HttpResponse(
+                    dataset.xlsx,
+                    content_type = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' 
+                )
+                today = datetime.date.today()
+                response['Content-Disposition'] = f"attachment; filename='Off_budget_{today}.xlsx'"
+                return response  
+            else:
+                return JsonResponse({'error':f'invalid form'})
 
 
     context = {
@@ -170,67 +171,24 @@ def add_insurance(request):
 def insurance_list_export(request):
     year = time_zone.now().year
     insurance_list = Insurance_number.objects.filter(date__year = year)
-    for item in insurance_list:
-        if item.FirstName in ['مغادر','ملغى'] or item.LastName in ['مغادر','ملغى']:
-            item.delete()
-        elif not item.Number:
-            item.delete()
-    resource = InsuranceNumberResource()
-    dataset = resource.export()
-    response = HttpResponse(
-        dataset.xlsx,
-        content_type = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' 
-    )
-    today = datetime.date.today()
-    response['content_desposition'] = f"attachement; filename='insurance_list_{today}'"
-    return response  
-
-def offBudgetControl(request):
-    depart_list = []
-    half_list = []
-    year = time_zone.now().year
-
-
-    form = OffBudgetControl(request.POST)
-    if form.is_valid:
-        departures = form.cleaned_data.get('Departures')
-        insurance_fees = form.cleaned_data.get('insurance_fees')
-        sport_ass = form.cleaned_data.get('sport_ass')
-        HalfAmmount = form.cleaned_data.get('HalfAmmount')
-        depart_list = departures.split(',')
-        half_list = HalfAmmount.split(',')
-
-    register = Insurance_number.objects.all().annotate(Additional_fees = 10.00, insurance_fees = insurance_fees, sport_ass = sport_ass)
-    for name in depart_list:
-        full_name = name.split(' ')
-        register.create(
-            FirstName = full_name[0],
-            LastName = full_name[1],
-            Additional_fees = 10.00
+    data = request.GET.get('data')
+    if data == 'insurance':
+        for item in insurance_list:
+            if item.FirstName in ['مغادر','ملغى'] or item.LastName in ['مغادر','ملغى']:
+                item.delete()
+            elif not item.Number:
+                item.delete()
+        resource = InsuranceNumberResource()
+        dataset = resource.export()
+        response = HttpResponse(
+            dataset.xlsx,
+            content_type = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' 
         )
-    for name in half_list:
-        full_name = name.split(' ')
-        x = register.get(
-            FirstName = full_name[0],
-            LastName = full_name[1],
-        )
-        x.sport_ass = sport_ass/2
-        x.save()
+        today = datetime.date.today()
+        response['content_desposition'] = f"attachement; filename='insurance_list_{today}'"
+        return response  
     
-    insurance_list = x.filter(date__year = year)
-    for item in insurance_list:
-        if item.FirstName in ['مغادر','ملغى'] or item.LastName in ['مغادر','ملغى']:
-            item.delete()
-        elif not item.Number:
-            item.delete()
-    resource = InsuranceNumberResource()
-    dataset = resource.export()
-    response = HttpResponse(
-        dataset.xlsx,
-        content_type = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' 
-    )
-    today = datetime.date.today()
-    response['content_desposition'] = f"attachement; filename='insurance_list_{today}'"
+    return JsonResponse({'error': 'bad request'})
 
 # الصفحة الخاصة بإضافة نشاط
 @allowed_user(allowed_roles = ['admin', 'general_surveillance'])
