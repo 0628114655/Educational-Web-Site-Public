@@ -121,17 +121,20 @@ def add_insurance(request):
                 depart_list = departures.split(',')
                 half_list = HalfAmmount.split(',')
 
-            register = Insurance_number.objects.all().annotate(Additional_fees = 10.00, insurance_fees = insurance_fees, sport_ass = sport_ass)
+            for obj in Insurance_number.objects.all():
+                obj.Additional_fees = 10.00
+                obj.insurance_fees = insurance_fees
+                obj.sport_ass = sport_ass
             for name in depart_list:
                 full_name = name.split(' ')
-                register.create(
+                Insurance_number.create(
                     FirstName = full_name[0],
                     LastName = full_name[1],
                     Additional_fees = 10.00
                 )
             for name in half_list:
                 full_name = name.split(' ')
-                x = register.get(
+                x = Insurance_number.objects.get(
                     FirstName = full_name[0],
                     LastName = full_name[1],
                 )
