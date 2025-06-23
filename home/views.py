@@ -42,72 +42,124 @@ def add_insurance(request):
     user_info = user
     date = time_zone.now().date()
     insurance_num = Insurance_number.objects.filter(date__year=date.year, Number__isnull = False)
+    form = OffBudgetControl()
     if request.method == 'POST':
-        student = request.POST.get('student')
-        if not student in ['مغادر', 'ملغى']:
-            FirstName = student.split(' ')[0]
-            LastName = student.split(' ')[1]
-            primary_number = request.POST.get('primary_number')
+        data = request.GET.get('data')
+        if data == 'insurance':
+            student = request.POST.get('student')
+            if not student in ['مغادر', 'ملغى']:
+                FirstName = student.split(' ')[0]
+                LastName = student.split(' ')[1]
+                primary_number = request.POST.get('primary_number')
 
-            last_number = Insurance_number.objects.order_by('-Number').first()
-            if last_number and last_number.Number:
-                insurance_number = last_number.Number + 1
-            else:
-                if not primary_number:
-                    return JsonResponse({'status': 'error', "message": 'المرجو إدخال رقم التأمين الابتدائي'})
+                last_number = Insurance_number.objects.order_by('-Number').first()
+                if last_number and last_number.Number:
+                    insurance_number = last_number.Number + 1
+                else:
+                    if not primary_number:
+                        return JsonResponse({'status': 'error', "message": 'المرجو إدخال رقم التأمين الابتدائي'})
+                    try:
+                        insurance_number = int(primary_number)
+                    except ValueError:
+                        return JsonResponse({'status': 'error', 'message': 'رقم التأمين غير صالح'})
                 try:
-                    insurance_number = int(primary_number)
-                except ValueError:
-                    return JsonResponse({'status': 'error', 'message': 'رقم التأمين غير صالح'})
-            try:
-                x = Insurance_number.objects.get(FirstName = FirstName, LastName = LastName)
-                x.Number = insurance_number
-                x.date = date
-                x.save()
-                return JsonResponse({'status': 'success', 'message': 'تمت إضافة رقم التأمين بنجاح', 'number': insurance_number})
-            except:
-                Insurance_number.objects.create(
-                    Number=insurance_number,
-                    FirstName=FirstName,
-                    LastName=LastName,
-                    date=date
-                )
+                    x = Insurance_number.objects.get(FirstName = FirstName, LastName = LastName)
+                    x.Number = insurance_number
+                    x.date = date
+                    x.save()
+                    return JsonResponse({'status': 'success', 'message': 'تمت إضافة رقم التأمين بنجاح', 'number': insurance_number})
+                except:
+                    Insurance_number.objects.create(
+                        Number=insurance_number,
+                        FirstName=FirstName,
+                        LastName=LastName,
+                        date=date
+                    )
 
-                return JsonResponse({'status': 'success', 'message': 'تمت إضافة التلميذ بنجاح', 'number': insurance_number})
+                    return JsonResponse({'status': 'success', 'message': 'تمت إضافة التلميذ بنجاح', 'number': insurance_number})
+            else:
+                primary_number = request.POST.get('primary_number')
+                last_number = Insurance_number.objects.order_by('-Number').first()
+
+                if last_number.Number:
+                    insurance_number = last_number.Number + 1
+                else:
+                    if not primary_number:
+                        return JsonResponse({'status': 'error', "message": 'المرجو إدخال رقم التأمين الابتدائي'})
+                    try:
+                        insurance_number = int(primary_number)
+                    except ValueError:
+                        return JsonResponse({'status': 'error', 'message': 'رقم التأمين غير صالح'})
+                if student == 'ملغى':
+                    Insurance_number.objects.create(
+                            Number=insurance_number,
+                            FirstName= 'ملغى',
+                            LastName= 'ملغى',
+                            date=date
+                        )
+                    return JsonResponse({'status': 'success', 'message': 'تم تجاوز الرقم الملغى بنجاح', 'number': insurance_number})
+                else:
+                    Insurance_number.objects.create(
+                            Number=insurance_number,
+                            FirstName= 'مغادر',
+                            LastName= 'مغادر',
+                            date=date
+                        )
+                    return JsonResponse({'status': 'success', 'message': 'تم تجاوز رقم التلميذ المغادر بنجاح', 'number': insurance_number})
         else:
-            primary_number = request.POST.get('primary_number')
-            last_number = Insurance_number.objects.order_by('-Number').first()
+            depart_list = []
+            half_list = []
+            year = time_zone.now().year
 
-            if last_number.Number:
-                insurance_number = last_number.Number + 1
-            else:
-                if not primary_number:
-                    return JsonResponse({'status': 'error', "message": 'المرجو إدخال رقم التأمين الابتدائي'})
-                try:
-                    insurance_number = int(primary_number)
-                except ValueError:
-                    return JsonResponse({'status': 'error', 'message': 'رقم التأمين غير صالح'})
-            if student == 'ملغى':
-                Insurance_number.objects.create(
-                        Number=insurance_number,
-                        FirstName= 'ملغى',
-                        LastName= 'ملغى',
-                        date=date
-                    )
-                return JsonResponse({'status': 'success', 'message': 'تم تجاوز الرقم الملغى بنجاح', 'number': insurance_number})
-            else:
-                Insurance_number.objects.create(
-                        Number=insurance_number,
-                        FirstName= 'مغادر',
-                        LastName= 'مغادر',
-                        date=date
-                    )
-                return JsonResponse({'status': 'success', 'message': 'تم تجاوز رقم التلميذ المغادر بنجاح', 'number': insurance_number})
+
+            form = OffBudgetControl(request.POST)
+            if form.is_valid():
+                departures = form.cleaned_data.get('Departures')
+                insurance_fees = form.cleaned_data.get('insurance_fees')
+                sport_ass = form.cleaned_data.get('sport_ass')
+                HalfAmmount = form.cleaned_data.get('HalfAmmount')
+                depart_list = departures.split(',')
+                half_list = HalfAmmount.split(',')
+
+            register = Insurance_number.objects.all().annotate(Additional_fees = 10.00, insurance_fees = insurance_fees, sport_ass = sport_ass)
+            for name in depart_list:
+                full_name = name.split(' ')
+                register.create(
+                    FirstName = full_name[0],
+                    LastName = full_name[1],
+                    Additional_fees = 10.00
+                )
+            for name in half_list:
+                full_name = name.split(' ')
+                x = register.get(
+                    FirstName = full_name[0],
+                    LastName = full_name[1],
+                )
+                x.sport_ass = sport_ass/2
+                x.save()
+            
+            insurance_list = x.filter(date__year = year)
+            for item in insurance_list:
+                if item.FirstName in ['مغادر','ملغى'] or item.LastName in ['مغادر','ملغى']:
+                    item.delete()
+                elif not item.Number:
+                    item.delete()
+            resource = insurance_list
+            dataset = resource.export()
+            response = HttpResponse(
+                dataset.xlsx,
+                content_type = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' 
+            )
+            today = datetime.date.today()
+            response['Content-Disposition'] = f"attachement; filename='insurance_list_{today}'"
+            return response  
+
 
 
     context = {
         'insurance_num': insurance_num,
         'user_info': user_info,
+        'form' : form,
     }
     return render(request, 'pages/insurance/add_insurance.html', context)
 
@@ -131,19 +183,51 @@ def insurance_list_export(request):
     return response  
 
 def offBudgetControl(request):
-    names = []
-    form = OffBudgetControl(request.POST or None)
+    depart_list = []
+    half_list = []
+    year = time_zone.now().year
+
+
+    form = OffBudgetControl(request.POST)
     if form.is_valid:
         departures = form.cleaned_data.get('Departures')
-        names = departures.split(',')
-        print(names)
+        insurance_fees = form.cleaned_data.get('insurance_fees')
+        sport_ass = form.cleaned_data.get('sport_ass')
+        HalfAmmount = form.cleaned_data.get('HalfAmmount')
+        depart_list = departures.split(',')
+        half_list = HalfAmmount.split(',')
 
-    OBCR = Insurance_number.objects.all().annotate(Additional_fees = 10.00 )
+    register = Insurance_number.objects.all().annotate(Additional_fees = 10.00, insurance_fees = insurance_fees, sport_ass = sport_ass)
+    for name in depart_list:
+        full_name = name.split(' ')
+        register.create(
+            FirstName = full_name[0],
+            LastName = full_name[1],
+            Additional_fees = 10.00
+        )
+    for name in half_list:
+        full_name = name.split(' ')
+        x = register.get(
+            FirstName = full_name[0],
+            LastName = full_name[1],
+        )
+        x.sport_ass = sport_ass/2
+        x.save()
     
-    context =   {
-        'form' : form
-    }
-    return render(request, 'pages/insurance/add_insurance.html', context)
+    insurance_list = x.filter(date__year = year)
+    for item in insurance_list:
+        if item.FirstName in ['مغادر','ملغى'] or item.LastName in ['مغادر','ملغى']:
+            item.delete()
+        elif not item.Number:
+            item.delete()
+    resource = InsuranceNumberResource()
+    dataset = resource.export()
+    response = HttpResponse(
+        dataset.xlsx,
+        content_type = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' 
+    )
+    today = datetime.date.today()
+    response['content_desposition'] = f"attachement; filename='insurance_list_{today}'"
 
 # الصفحة الخاصة بإضافة نشاط
 @allowed_user(allowed_roles = ['admin', 'general_surveillance'])
