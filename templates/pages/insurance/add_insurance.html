@@ -5,10 +5,10 @@
 {% block content %}
 
 <div class="container-fluid w-75">
-  <div class="insurance_form">
+  <div class="insu_form">
     <center class="text-info"> <h4> لوائح التأمين </h4></center>
     <div class="m-5 p-2">
-          <form method="post"  >
+          <form method="post"  id="insuranceForm">
               {% csrf_token %}
               
               {% if not insurance_num %}
@@ -20,11 +20,11 @@
           </form>
           <div id="response"></div>
     </div>
-    <a href="{% url 'insurance_list_export' %}?data=insurance" class="mx-3 text-info">تصدير لوائح التأمين</a>
+    <a href="{% url 'insurance_list_export' %}" class="mx-3 text-info">تصدير لوائح التأمين</a>
     <a href="#" id="download_button" class="mx-3 text-info">تحميل سجل مراقبة الخارج عن الميزانية</a>
   </div>
   <div class="Off_budget_control hidden"  >
-    <form action="" method="POST">
+    <form action="{% url 'OffBudgetControl' %}" method="POST">
       {% csrf_token %}
       {{form}}
       <button type="submit"  class="btn btn-outline-info">تحميل سجل مراقبة الخارج عن الميزانية</button>
@@ -34,12 +34,12 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
 button = document.querySelector('#download_button')
-insurance_form = document.querySelector('.insurance_form')
+insu_form = document.querySelector('.insu_form')
 budget_control = document.querySelector('.Off_budget_control')
 button.addEventListener('click', myFunction)
 function myFunction(){
   budget_control.classList.remove('hidden')
-  insurance_form.classList.add('hidden')
+  insu_form.classList.add('hidden')
 
 }
   $("#insuranceForm").on("submit", function(e) {

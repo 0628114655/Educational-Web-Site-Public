@@ -42,11 +42,9 @@ def add_insurance(request):
     user = request.user
     user_info = user
     date = time_zone.now().date()
-    year = time_zone.now().year
     insurance_num = Insurance_number.objects.filter(date__year=date.year, Number__isnull = False)
-    form = OffBudgetControl(request.POST or None)
+    form = OffBudgetControl()
     if request.method == 'POST':
-        try:
             student = request.POST.get('student')
             if not student in ['مغادر', 'ملغى']:
                 FirstName = student.split(' ')[0]
@@ -106,22 +104,49 @@ def add_insurance(request):
                             date=date
                         )
                     return JsonResponse({'status': 'success', 'message': 'تم تجاوز رقم التلميذ المغادر بنجاح', 'number': insurance_number})
-        except:
+      
+    context = {
+        'insurance_num': insurance_num,
+        'user_info': user_info,
+        'form' : form,
+    }
+    return render(request, 'pages/insurance/add_insurance.html', context)
+
+# تصدير لوائح التأمين
+def insurance_list_export(request):
+    year = time_zone.now().year
+    insurance_list = Insurance_number.objects.filter(date__year = year).exclude(
+                    Q(FirstName__in=['مغادر', 'ملغى']) |
+                    Q(LastName__in=['مغادر', 'ملغى']) |
+                    Q(Number__isnull=True)
+    )
+    resource = InsuranceNumberResource()
+    dataset = resource.export(insurance_list)
+    response = HttpResponse(
+        dataset.xlsx,
+        content_type = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' 
+    )
+    today = datetime.date.today()
+    response['content_desposition'] = f"attachment; filename='insurance_list_{today}'"
+    return response  
+    
+
+def off_budget_control(request):
+            year = time_zone.now().year
+            form = OffBudgetControl(request.POST or None)            
             if form.is_valid():
                 departures = form.cleaned_data.get('Departures')
                 Insurance_fees = form.cleaned_data.get('Insurance_fees')
                 sport_ass = form.cleaned_data.get('sport_ass')
                 HalfAmmount = form.cleaned_data.get('HalfAmmount')
-                depart_list = departures.split(',') if departures else []
-                half_list = HalfAmmount.split(',') if HalfAmmount else []
-            
+                depart_list = departures.split(' - ') if departures else []
+                half_list = HalfAmmount.split(' - ') if HalfAmmount else []
                 insurance_list = Insurance_number.objects.all()
                 for item in insurance_list:
                     item.Additional_fees = 10.00
                     item.Insurance_fees = Insurance_fees
                     item.sport_ass = sport_ass
                     item.save()
-
                 for name in depart_list:
                     full_name = name.split(' ')
                     Insurance_number.objects.create(
@@ -142,9 +167,8 @@ def add_insurance(request):
                         return JsonResponse ({'error':'الأسماء الواردة بخانة المؤدين لنصف مبلغ الجمعية الرياضية غير موجود بقاعدة البيانات'})
                 
                 insurance_list = Insurance_number.objects.filter(date__year = year).exclude(
-                    Q(FirstName__in=['مغادر', 'ملغى']) |
-                    Q(LastName__in=['مغادر', 'ملغى']) |
-                    Q(Number__isnull=True)
+                    Q(FirstName__in=[ 'ملغى']) |
+                    Q(LastName__in=[ 'ملغى']) 
                     )
                 
                 resource = OffBudgetControlResource()
@@ -154,41 +178,12 @@ def add_insurance(request):
                     content_type = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' 
                 )
                 today = datetime.date.today()
-                response['Content-Disposition'] = f"attachment; filename='Off_budget_{today}.xlsx'"
+                response['Content-Disposition'] = f"attachment; filename=Off_budget_{today}.xlsx"
                 return response  
             else:
                 return JsonResponse({'error':f'invalid form'})
 
 
-    context = {
-        'insurance_num': insurance_num,
-        'user_info': user_info,
-        'form' : form,
-    }
-    return render(request, 'pages/insurance/add_insurance.html', context)
-
-# تصدير لوائح التأمين
-def insurance_list_export(request):
-    year = time_zone.now().year
-    insurance_list = Insurance_number.objects.filter(date__year = year)
-    data = request.GET.get('data')
-    if data == 'insurance':
-        for item in insurance_list:
-            if item.FirstName in ['مغادر','ملغى'] or item.LastName in ['مغادر','ملغى']:
-                item.delete()
-            elif not item.Number:
-                item.delete()
-        resource = InsuranceNumberResource()
-        dataset = resource.export()
-        response = HttpResponse(
-            dataset.xlsx,
-            content_type = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' 
-        )
-        today = datetime.date.today()
-        response['content_desposition'] = f"attachement; filename='insurance_list_{today}'"
-        return response  
-    
-    return JsonResponse({'error': 'bad request'})
 
 # الصفحة الخاصة بإضافة نشاط
 @allowed_user(allowed_roles = ['admin', 'general_surveillance'])

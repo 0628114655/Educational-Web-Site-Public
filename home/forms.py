@@ -196,7 +196,7 @@ class Add_activity(forms.ModelForm):
         fields = ['title', 'dateTime', 'content']
 
 class OffBudgetControl(forms.Form):
-    Departures = forms.CharField(label='أسماء التلاميذ المغادرين: (الاسم الشخصي الاسم العائلي - الاسم الشخصي الاسم العائلي ...)', widget=forms.TextInput(attrs={'class' : 'form-control'}))
+    Departures = forms.CharField(label='أسماء التلاميذ المغادرين: (الاسم الشخصي الاسم العائلي - الاسم الشخصي الاسم العائلي ...)', widget=forms.TextInput(attrs={'class' : 'form-control'}),required=False)
     sport_ass = forms.DecimalField(label='المبلغ المستخلص بالجمعية الرياضية', widget=forms.NumberInput(attrs={'class' : 'form-control'}))
-    HalfAmmount = forms.CharField(label='ضع أسماء التلاميذ الذين أدوا نصف مبلغ الجمعية الرياضية: (الاسم الشخصي الاسم العائلي - الاسم الشخصي الاسم العائلي ...)', widget=forms.TextInput(attrs={"class": "form-control"}))
+    HalfAmmount = forms.CharField(label='ضع أسماء التلاميذ الذين أدوا نصف مبلغ الجمعية الرياضية: (الاسم الشخصي الاسم العائلي - الاسم الشخصي الاسم العائلي ...)', widget=forms.TextInput(attrs={"class": "form-control"}),required=False)
     Insurance_fees = forms.DecimalField(label='مبلغ التأمين', widget=forms.NumberInput(attrs={"class": "form-control"}))

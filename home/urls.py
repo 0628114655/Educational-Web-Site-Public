@@ -32,6 +32,7 @@ urlpatterns=[
     # التأمين المدرسي
     path('add_insurance/', views.add_insurance, name = 'add_insurance'),
     path('insurance_list_export/', views.insurance_list_export, name = 'insurance_list_export'),
+    path('OffBudgetControl/', views.off_budget_control, name = 'OffBudgetControl'),
 
 
 
