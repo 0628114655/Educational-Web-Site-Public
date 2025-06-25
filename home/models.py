@@ -239,10 +239,12 @@ class Insurance_number(models.Model):
     FirstName = models.CharField(max_length=50, null = True, blank=True)
     LastName = models.CharField(max_length=50, null = True, blank=True)
     MassarCode = models.CharField(max_length=50, null = True, blank=True)
-    date = models.DateField(null = True)
+    date = models.DateField(null = True, default=time_zone.now)
     Insurance_fees = models.DecimalField(max_digits=4, decimal_places=2, null = True, blank=True)
     sport_ass = models.DecimalField(max_digits=4, decimal_places=2, null = True, blank=True)
     Additional_fees = models.DecimalField(max_digits=4, decimal_places=2, null = True, blank=True)
+    notes = models.CharField(max_length=100, null = True, blank=True)
+
 
     def __str__(self):
         return f'The insurance number [{self.Number}] of the student: {self.FirstName} {self.LastName}'

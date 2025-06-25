@@ -9,10 +9,8 @@ from django.forms import modelformset_factory
 from django.contrib.auth.models import Group
 from django.contrib import messages
 from django.db.models.functions import ExtractYear, ExtractMonth
-from django.core.mail import send_mail
 import urllib.parse
 from .resources import *
-from tablib import Dataset
 import datetime
 from django.db.models import Q
 
@@ -141,7 +139,7 @@ def off_budget_control(request):
                 HalfAmmount = form.cleaned_data.get('HalfAmmount')
                 depart_list = departures.split(' - ') if departures else []
                 half_list = HalfAmmount.split(' - ') if HalfAmmount else []
-                insurance_list = Insurance_number.objects.all()
+                insurance_list = Insurance_number.objects.all().exclude(notes = 'مغادر')
                 for item in insurance_list:
                     item.Additional_fees = 10.00
                     item.Insurance_fees = Insurance_fees
@@ -152,7 +150,9 @@ def off_budget_control(request):
                     Insurance_number.objects.create(
                         FirstName = full_name[0],
                         LastName = full_name[1],
-                        Additional_fees = 10.00
+                        Additional_fees = 10.00,
+                        notes = 'مغادر'
+                    
                     )
                 for name in half_list:
                     full_name = name.split(' ')
@@ -164,7 +164,7 @@ def off_budget_control(request):
                         x.sport_ass = sport_ass / 2
                         x.save()
                     except:
-                        return JsonResponse ({'error':'الأسماء الواردة بخانة المؤدين لنصف مبلغ الجمعية الرياضية غير موجود بقاعدة البيانات'})
+                        return JsonResponse ({'error':'Incorrect name! there is no student with the enterred name.'})
                 
                 insurance_list = Insurance_number.objects.filter(date__year = year).exclude(
                     Q(FirstName__in=[ 'ملغى']) |
