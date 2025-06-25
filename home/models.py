@@ -79,7 +79,7 @@ class Student(models.Model):
         ).count()
 
 class Staff(models.Model):
-    choices =  [('أستاذ', 'أستاذ'), ('حارس عام', 'حارس عام'), ('مشرف', 'مشرف')]
+    choices =  [('أستاذ', 'أستاذ'), ('حارس عام', 'حارس عام'), ('مشرف', 'مشرف'), ('مقتصد', 'مقتصد')]
     FirstName = models.CharField(max_length = 50)
     LastName = models.CharField(max_length = 50)
     PPR = models.CharField(max_length = 50)

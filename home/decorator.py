@@ -5,8 +5,8 @@ def allowed_user(allowed_roles = []):
         def wrapper_funct(request, *args, **kwargs):
             group = None
             if request.user.groups.exists():
-                group = request.user.groups.all()[0].name
-            if group and group in allowed_roles:
+                group = request.user.groups.values_list('name', flat = True)
+            if any(g in allowed_roles for g in group) :
                 return view_func(request, *args, **kwargs)
             else:
                 return HttpResponse('أنت غير مؤهل لزيارة هذه الصفحة.')

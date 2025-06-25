@@ -36,6 +36,7 @@ def home (request):
     return render (request,'pages/home.html', context)
 
 # إضافة أرقام للتأمين
+@allowed_user(allowed_roles = ['bursar'])
 def add_insurance(request):
     user = request.user
     user_info = user
@@ -111,6 +112,7 @@ def add_insurance(request):
     return render(request, 'pages/insurance/add_insurance.html', context)
 
 # تصدير لوائح التأمين
+@allowed_user(allowed_roles = ['bursar'])
 def insurance_list_export(request):
     year = time_zone.now().year
     insurance_list = Insurance_number.objects.filter(date__year = year).exclude(
@@ -128,7 +130,7 @@ def insurance_list_export(request):
     response['content_desposition'] = f"attachment; filename='insurance_list_{today}'"
     return response  
     
-
+@allowed_user(allowed_roles = ['bursar'])
 def off_budget_control(request):
             year = time_zone.now().year
             form = OffBudgetControl(request.POST or None)            
@@ -1067,7 +1069,7 @@ def signout(request):
     logout (request)
     return redirect('/signin/')
 
-@allowed_user(allowed_roles=['admin', 'teacher', 'general_survaillance', 'student'])
+@allowed_user(allowed_roles=['admin', 'teacher', 'general_survaillance', 'student', 'bursar'])
 def UserInfo(request):
     user = request.user
     user_info = None
