@@ -2,13 +2,7 @@ from pathlib import Path
 import os
 from decouple import config
 import ssl
-# import certifi
 
-# ssl_context = ssl.create_default_context(cafile=certifi.where())
-
-
-
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
