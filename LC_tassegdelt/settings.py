@@ -1,7 +1,8 @@
 from pathlib import Path
 import os
 from decouple import config
-import ssl
+from django.contrib.sitemaps.views import sitemap
+
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -28,6 +29,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'django.contrib.sitemaps',
     'home.apps.HomeConfig',
     'django.contrib.admin',
     'django.contrib.auth',

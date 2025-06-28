@@ -3,10 +3,36 @@ from .import views
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.auth.views import PasswordChangeView, PasswordChangeDoneView
+from .sitemaps import (
+    AnnounceSitemap, HomeSitemap, SubjectSitemap, SectionSitemap,
+    CourseSitemap, StudentSitemap, StaffSitemap, ActivitiesSitemap,
+    HomeWorkSitemap, ExamCorrectionSitemap, ClasseSitemap, ReportSitemap,
+    AbsenceSitemap
+)
+from django.contrib.sitemaps.views import sitemap
+
+
+sitemaps = {
+    'announces': AnnounceSitemap,
+    'home': HomeSitemap,
+    'subjects': SubjectSitemap,
+    'sections': SectionSitemap,
+    'courses': CourseSitemap,
+    'students': StudentSitemap,
+    'staffs': StaffSitemap,
+    'activities': ActivitiesSitemap,
+    'homeworks': HomeWorkSitemap,
+    'exam_corrections': ExamCorrectionSitemap,
+    'classes': ClasseSitemap,
+    'reports': ReportSitemap,
+    'absences': AbsenceSitemap,
+}
 
 
 urlpatterns=[
     path('', views.home, name = 'home'),
+    path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap'),
+
 
     # تعرض فيها مختلف الأقسام
     path('classes/', views.classes, name = 'classes'),

@@ -690,13 +690,11 @@ def studentAbsence(request, id):
 
                     encoded_message = urllib.parse.quote(send_message)
                     whatsapp_url = f"https://wa.me/+212{number_phone}?text={encoded_message}"
-                    # webbrowser.open(whatsapp_url)  
 
                 except Exception as e:
                     print(f"فشل إرسال رسالة الواتساب: {e}")
 
             messages.success(request, 'لقد تمت إضافة غياب بنجاح.')
-            # return redirect('studentAbsence', id = student.id)
             
         except Exception as e:
             message = 'لقد حدث خطأ غير متوقع'
@@ -711,7 +709,7 @@ def studentAbsence(request, id):
         'monthlyAbsenceCount' : monthlyAbsenceCount,
         'whatsapp_url' : whatsapp_url,
     }
-    return render(request, 'pages/attendance/absence/studentAbsence.html', context)
+    return render(request, 'pages/attendance/absence/StudentAbsence.html', context)
 # الدالة الخاصة بعرض الغياب الإجمالي للتلميذ
 @allowed_user(allowed_roles=['general_surveillance', 'admin'])
 def studentTotalAbsence(request, id):

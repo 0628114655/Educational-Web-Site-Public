@@ -5,6 +5,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- إضاقة صورة عند مشاركة الموقع ضمن رابط -->
+    <meta property="og:title" content="الموقع الإلكتروني للثانوية الإعدادية أنس بن مالك">
+    <meta property="og:description" content="نافذة للتواصل بين المؤسسة ومحيطها التربوي والاجتماعي.">
+    <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{% static 'photos/aim.jpg' %}">
+    <meta property="og:image:alt" content="شعار الموقع التعليمي">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ request.scheme }}://{{ request.get_host }}{{ request.path }}">
+    <!--  -->
+
+    <!-- favicon -->
+    <link rel="icon" href="{% static 'photos/aim.jpg' %}" type="image/x-icon">
+    <!--  -->
+
     <title > الثانوية الإعدادية أنس بن مالك</title>
     <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
     <link rel="stylesheet" href="{% static 'css/style.css' %}">

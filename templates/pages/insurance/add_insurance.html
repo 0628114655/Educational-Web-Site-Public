@@ -16,12 +16,12 @@
               {% endif %}
 
               <input type="text" name="student" placeholder="اسم التلميذ" id="student" required>
-              <button type="submit" class="btn btn-outline-info">إضافة</button>
+              <button type="submit" class="btn btn-outline-info m-2">إضافة</button>
           </form>
           <div id="response"></div>
     </div>
     <a href="{% url 'insurance_list_export' %}" class="mx-3 text-info">تصدير لوائح التأمين</a>
-    <a href="#" id="download_button" class="mx-3 text-info">تحميل سجل مراقبة الخارج عن الميزانية</a>
+    <a href="#" id="download_button" class="mx-3 text-info" style="white-space:nowrap">تحميل سجل مراقبة الخارج عن الميزانية</a>
   </div>
   <div class="Off_budget_control hidden"  >
     <form action="{% url 'OffBudgetControl' %}" method="POST">

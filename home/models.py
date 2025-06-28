@@ -2,6 +2,8 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone as time_zone
 from datetime import *
+from django.urls import reverse
+
 
 
 class UserProfile(models.Model):
@@ -20,6 +22,8 @@ class Announce(models.Model):
     def __str__(self):
         return self.title
     
+    def get_absolute_url(self):
+        return reverse('announce', args=[str(self.id)])
     @property
     def is_recent(self):
         return time_zone.now().date() - self.date <= timedelta(days = 15)
