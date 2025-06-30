@@ -44,17 +44,18 @@
                 <div class="card card-body">
                     {% if absences %}
                         {% for month, absence in absences.items %}
-                            <div class="d-flex align-items-center  flex-wrap gap-3 mb-2">
-                                <a class="btn btn-outline-success my-2" style="width: 320px" data-toggle="collapse" href="#collapseMonth{{ year }}{{ month }}" role="button" aria-expanded="false" aria-controls="collapseMonth{{ year }}{{ month }}">
+                            <div class="d-flex align-items-center  flex-wrap gap-3 mb-2" >
+                                <a class="btn btn-outline-success my-2" style="max-width: 100%; width:auto; word-break:break-word; white-space:normal" data-toggle="collapse" href="#collapseMonth{{ year }}{{ month }}" role="button" aria-expanded="false" aria-controls="collapseMonth{{ year }}{{ month }}">
                                     الشهر: {{ month|get_month }} (
                                     مجموع الغياب: {% with monthCount|get_item:year|get_item:month as total %}{{ total }}{% endwith %}
                                     )
                                 </a>
                                 {% if student.number_phone %}
-                                <div class="alert alert-success d-flex flex-wrap align-items-center justify-content-between my-2 mt-2 mx-2 gap-3 ">
-                                    <p class="mb-0">تم إنشاء رسالة واتساب لولي الأمر. اضغط على الزر أدناه لإرسالها:</p>
+                                <div class="alert alert-success d-flex flex-wrap align-items-center justify-content-between my-2 mt-2 mx-2 gap-3 " style="max-width: 100%; width:auto; white-space:normal; word-break:break-word">
+                                    <p class="mb-0" >تم إنشاء رسالة واتساب لولي الأمر. اضغط على الزر أدناه لإرسالها:</p>
                                     <a href="#" target="_blank"
                                        class="btn btn-success d-flex align-items-center send-whatsapp-message"
+                                       style="max-width: 100%; width:auto; white-space:normal; word-break:break-word"
                                        data-month="{{ month|get_month }}"
                                        data-month-absences="{% with monthCount|get_item:year|get_item:month as total %}{{ total }}{% endwith %}"
                                        data-non-justify="{% with absence_data|get_item:year|get_item:month as total %}{{ total }}{% endwith %}"

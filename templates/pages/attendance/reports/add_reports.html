@@ -23,13 +23,13 @@
       </div>
       <div class="row mb-4">
         <div class="col-12">
-          <div class="d-flex justify-content-between align-items-center p-3 bg-light border rounded">
-              <h4 class="mb-0">
+          <div class="row d-flex justify-content-between align-items-center p-1 bg-light border rounded">
+              <h4 class="col-sm-12 m-1" style="width: auto; max-width:100%;">
                 <i class="fas fa-calendar-day text-primary me-2"></i> التقارير   
               </h4>
-              <div>
-                <span class="badge  text-dark me-2">تاريخ اليوم: {% now "Y-m-d" %}</span>
-                <button class="btn btn-sm btn-primary" onclick="window.print()">
+              <div class="col-sm-12 m-1 p-1" >
+                <span class="badge  text-dark me-2" style="width: auto; max-width:100%; white-space:normal; word-break:break-word">تاريخ اليوم: {% now "Y-m-d" %}</span>
+                <button class="btn btn-sm btn-primary" onclick="window.print()" style="width: auto; max-width:100%; white-space:normal; word-break:break-word">
                   <i class="fas fa-print me-1"></i> طباعة
                 </button>
               </div>

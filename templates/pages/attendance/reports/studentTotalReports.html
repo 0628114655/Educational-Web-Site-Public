@@ -47,7 +47,7 @@
                         {% for month, report in reports.items %}
 
                             <div class="d-flex align-items-center flex-wrap gap-3 mb-2">
-                                <a class="btn btn-outline-success my-2" data-toggle="collapse" href="#collapseMonth{{ year }}{{ month }}" role="button" aria-expanded="false" aria-controls="collapseMonth{{ year }}{{ month }}">
+                                <a class="btn btn-outline-success my-2" data-toggle="collapse" style="max-width: 100%; width:auto; white-space:normal; word-break:break-word" href="#collapseMonth{{ year }}{{ month }}" role="button" aria-expanded="false" aria-controls="collapseMonth{{ year }}{{ month }}">
                                     الشهر: {{ month|get_month }}
                                     (
                                     <span> مجموع الغياب خلال الشهر {% with monthCount|get_item:year|get_item:month as total %} {{total}} {% endwith %}  </span>
@@ -55,10 +55,10 @@
 
                                 </a>
                                 {% if whatsapp_url %}
-                                <div class="alert alert-success d-flex flex-wrap align-items-center justify-content-between my-2 mt-2 mx-2 gap-3">
+                                <div class="alert alert-success d-flex flex-wrap align-items-center justify-content-between my-2 mt-2 mx-2 gap-3" style="max-width: 100%; width:auto; white-space:normal; word-break:break-word">
                                         <p class="mb-0">تم إنشاء رسالة واتساب لولي الأمر. اضغط على الزر أدناه لإرسالها:</p>
 
-                                        <a href="{{ whatsapp_url }}" target="_blank" class="btn btn-success d-flex align-items-center">
+                                        <a href="{{ whatsapp_url }}" target="_blank" class="btn btn-success d-flex align-items-center" style="max-width: 100%; width:auto; white-space:normal; word-break:break-word">
                                             <i class="fab fa-whatsapp mx-2"></i> إرسال الرسالة عبر واتساب
                                         </a>                                    
                                     </div>
