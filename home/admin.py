@@ -6,8 +6,8 @@ from import_export.admin import ImportExportModelAdmin
 from django.templatetags.static import static
 
 class StudentAdmin(ImportExportModelAdmin):
-    list_display = ('first_name', 'last_name', 'number_phone', 'sections', 'massar_num')
-    search_fields = ['first_name', 'last_name']
+    list_display = ('code', 'prenom', 'nom', 'number_phone', 'sections', )
+    search_fields = ['prenom', 'nom', 'code']
 
 class InsuranceNumberAdmin(ImportExportModelAdmin, admin.ModelAdmin):
     list_display = ('FirstName', 'LastName', 'MassarCode', 'Number')
@@ -27,7 +27,6 @@ admin.site.register(Student, StudentAdmin)
 admin.site.register(Staff, StaffAdmin)
 admin.site.register(Insurance_number, InsuranceNumberAdmin)
 admin.site.register(Section, )
-admin.site.register(ExamMark,  )
 admin.site.register(Announce)
 admin.site.register(Home)
 admin.site.register(Course)
@@ -36,7 +35,6 @@ admin.site.register(HomeWork)
 admin.site.register(UserProfile)
 admin.site.register(Subject)
 admin.site.register(ExamCorrection)
-admin.site.register(Classe)
 admin.site.register(Files)
 admin.site.register(Absence, AbsenceAdmin)
 admin.site.register(Report)

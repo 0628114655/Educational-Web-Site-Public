@@ -6,6 +6,8 @@
 {% block content %}
 
 <div class="container">
+    <center class="text-info mb-4" > <h4>أنشطة الحياة المدرسية</h4> </center>
+
     {% if messages %}
         {% for message in messages %}
             <div class="alert alert-{{ message.tags }}">{{ message }}</div>
@@ -55,14 +57,14 @@
         <br>
         
         {% if 'admin' in request.user.groups.all|join:", " or 'general_surveillance' in request.user.groups.all|join:", " %}
-            <a href="{% url 'add_activity' %}" class="text-info m-4" style="font-size:larger;">إضافة نشاط</a>
+            <a href="{% url 'add_activity' %}" class="text-info m-4" style="font-size:large;">إضافة نشاط</a>
         {% endif  %}
     </div>
     {% else %}
     <h4>{{message}}</h4>
     {% if 'admin' in request.user.groups.all|join:", " or 'general_surveillance' in request.user.groups.all|join:", " %}
     <br><hr>
-    <a href="{% url 'add_activity' %}" class="text-info m-4" style="font-size:larger;">إضافة نشاط</a>
+    <a href="{% url 'add_activity' %}" class="text-info m-4" style="font-size:large;">إضافة نشاط</a>
     {% endif  %}
 {% endif %}  
 <br>  

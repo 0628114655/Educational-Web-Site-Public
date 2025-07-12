@@ -58,14 +58,13 @@ class Course(models.Model):
         return self.title if self.title else 'درس بدون عنوان'
 
 class Student(models.Model):
-    massar_num = models.CharField(max_length = 50, null = True, blank = True)
-    first_name = models.CharField(max_length = 50)
-    last_name = models.CharField(max_length = 50)
+    code = models.CharField(max_length = 50, null = True, blank = True)
+    prenom = models.CharField(max_length = 50)
+    nom = models.CharField(max_length = 50)
     sections = models.ForeignKey(Section, related_name="students", blank = True, null = True, on_delete = models.SET_NULL)
     number_phone = models.CharField(max_length = 14, null = True, blank = True)
-    parentEmail = models.EmailField(null=True, blank = True)
     def __str__(self):
-        return f'{self.first_name} {self.last_name}' 
+        return f'{self.prenom} {self.nom}' 
     
     
     def get_non_justify(self, year, month):
@@ -168,27 +167,6 @@ class ExamCorrection(models.Model):
     def __str__(self):
         return self.title
 
-class ExamMark(models.Model):
-    student = models.ForeignKey(Student, null=True, on_delete=models.SET_NULL)
-    first_mark = models.FloatField(null=True, blank=True)
-    second_mark = models.FloatField(null=True, blank=True)
-    third_mark = models.FloatField(null=True, blank=True)
-    subject = models.ForeignKey(Subject, null=True, on_delete=models.SET_NULL)
-    section = models.ForeignKey(Section, null=True, on_delete=models.SET_NULL)  # إضافة حقل القسم
-    def __str__(self):
-        return f'{self.student.first_name} {self.student.last_name}'
-    
-class Classe(models.Model):
-    name = models.CharField(max_length=100, null = True)
-    section = models.ForeignKey(Section, null=True, on_delete=models.SET_NULL, related_name='classes')
-    students = models.ManyToManyField(Student, related_name='classes')
-
-    def __str__(self):
-        if self.section:
-            return f'Class: {self.name} in Section: {self.section.name}'
-        else:
-            return f'Class: {self.name} (No Section)'
-
 class Report(models.Model):
     title = models.CharField(max_length=100, verbose_name="الإجراء الواجب اتخاذه")
     material = models.ForeignKey(Subject, on_delete=models.CASCADE, verbose_name="المادة")
@@ -203,7 +181,7 @@ class Report(models.Model):
         super().save(*args, **kwargs)
     
     def __str__(self):
-        return f'تقرير عن التلميذ(ة): {self.student.first_name} {self.student.last_name}'
+        return f'تقرير عن التلميذ(ة): {self.student.prenom} {self.student.nom}'
     class Meta:
         ordering = ['-date']
 
@@ -233,7 +211,7 @@ class Absence(models.Model):
         super().save(*args, **kwargs)
 
     def __str__ (self):
-        return f'غياب للتلميذ(ة) {self.student.first_name} {self.student.last_name}, بتاريخ {self.dateTime} ( {self.absenceHours} )'
+        return f'غياب للتلميذ(ة) {self.student.prenom} {self.student.nom}, بتاريخ {self.dateTime} ( {self.absenceHours} )'
 
     class Meta:
         ordering = ['-dateTime']

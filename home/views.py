@@ -39,7 +39,7 @@ def home (request):
 @allowed_user(allowed_roles = ['bursar'])
 def add_insurance(request):
     user = request.user
-    user_info = user
+    user_info =  UserProfile.objects.get(user = user)
     date = time_zone.now().date()
     insurance_num = Insurance_number.objects.filter(date__year=date.year, Number__isnull = False)
     form = OffBudgetControl()
@@ -184,8 +184,6 @@ def off_budget_control(request):
                 return response  
             else:
                 return JsonResponse({'error':f'invalid form'})
-
-
 
 # الصفحة الخاصة بإضافة نشاط
 @allowed_user(allowed_roles = ['admin', 'general_surveillance'])
@@ -606,13 +604,23 @@ def add_course(request):
 # الدالة الخاصة بعرض الأقسام 
 @allowed_user(allowed_roles=['general_surveillance', 'admin'])
 def classes(request): 
-    user = request.user
-    user_info = UserProfile.objects.get(user = user)
+    message = None
     classes = Section.objects.all()
+    if not classes:
+        message = 'لا توجد أقسام بعد.'
+    try:
+        user = request.user
+        user_info = UserProfile.objects.get(user = user)
+
+
+    except UserProfile.DoesNotExist:
+        user_info = None
+
     
     context = {
         'user_info' : user_info,
-        'classes' : classes
+        'classes' : classes,
+        'message' : message
     }
     return render(request, 'pages/attendance/classes.html', context)
 
@@ -670,7 +678,7 @@ def studentAbsence(request, id):
             time = request.POST.get('time')
             hour = Hour.objects.get(id = time)
             send_message = (
-                            f"ولي أمر التلميذ(ة) {student.first_name} {student.last_name}،\n"
+                            f"ولي أمر التلميذ(ة) {student.prenom} {student.nom}،\n"
                             f"نحيطكم علماً أنه تم تسجيل غياب ابنكم بتاريخ {date}.\n"
                             f"نوع الغياب: {status}\n"
                             f"ملاحظات إضافية: {notes}\n\n"
@@ -787,7 +795,7 @@ def add_reports(request, id):
             )
             messages.success(request, 'لقد تمت إضافة التقرير بنجاح.')
             send_message = (
-                f"ولي أمر التلميذ(ة) {student.first_name} {student.last_name}،\n"
+                f"ولي أمر التلميذ(ة) {student.prenom} {student.nom}،\n"
                 f"نحيطكم علماً أنه تم تسجيل تقرير سلوكي بابنكم بتاريخ {date}.\n"
                 f"تفاصيل التقرير:\n"
                 f"الموضوع: {report_content}\n"
@@ -853,7 +861,7 @@ def studentTotalreports(request, id):
     month = ARABIC_MONTHS[month]
 
     send_message = (
-                            f"ولي أمر التلميذ(ة) {student.first_name} {student.last_name}،\n"
+                            f"ولي أمر التلميذ(ة) {student.prenom} {student.nom}،\n"
                             f"نحيطكم علماً أن مجموع التقارير السلوكية بابنكم خلال شهر  {month} من  هذا الموسم الدراسي بلغت {month_reports} (تقارير) .\n"
                             f"يرجى التواصل مع الإدارة لمزيد من التفاصيل.\n"
                         )
@@ -862,7 +870,6 @@ def studentTotalreports(request, id):
         try:
             encoded_message = urllib.parse.quote(send_message)
             whatsapp_url = f"https://wa.me/+212{number_phone}?text={encoded_message}"
-            # webbrowser.open(whatsapp_url)  
 
         except Exception as e:
             print(f"فشل إرسال رسالة الواتساب: {e}")
@@ -995,7 +1002,7 @@ def signup(request):
             user_type = form.cleaned_data.get('user_type')
             user.set_password(password)
             if user_type == 'student':
-                student =  Student.objects.filter(first_name = firstname, last_name = lastname, massar_num = username).first()
+                student =  Student.objects.filter(prenom = firstname, nom = lastname, code = username).first()
                 if student:
                     user.save()
                     student_group = Group.objects.get(name='student')  
@@ -1067,29 +1074,30 @@ def signout(request):
     logout (request)
     return redirect('/signin/')
 
-@allowed_user(allowed_roles=['admin', 'teacher', 'general_survaillance', 'student', 'bursar'])
 def UserInfo(request):
     user = request.user
     user_info = None
     staffInfo = None
     studentInfo = None
     message = None
-    try:
-        user_info = UserProfile.objects.get(user=user)
+    if user.is_authenticated:
         try:
-            staffInfo = Staff.objects.get(PPR=user.username)
-        except Staff.DoesNotExist:
-            pass
+            user_info = UserProfile.objects.get(user=user)
+            try:
+                staffInfo = Staff.objects.get(PPR=user.username)
+            except Staff.DoesNotExist:
+                pass
 
-        try:
-            studentInfo = Student.objects.get(massar_num=user.username)
-        except Student.DoesNotExist:
-            pass
+            try:
+                studentInfo = Student.objects.get(code=user.username)
+            except Student.DoesNotExist:
+                pass
 
-    except Exception as e:
-        message = 'لقد حدث خطأ غير متوقع'
-        print(f'error id {e}')
-
+        except Exception as e:
+            message = f'لقد حدث خطأ غير متوقع ({e})'
+            print(f'error id {e}')
+    else:
+        message = 'أنت غير مؤهل لزيارة هذه الصفحة.'
     context = {
         'user_info': user_info,
         'staffInfo' : staffInfo,

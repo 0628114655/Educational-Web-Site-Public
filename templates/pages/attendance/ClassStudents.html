@@ -28,8 +28,8 @@
         </tr>
         {% for s in students %}
         <tr>
-            <td class="">{{s.massar_num}}</td>
-            <td class=""> <a style="color: inherit;" href="{% url 'StudentAttendance' s.id %}"> {{s.first_name}} {{ s.last_name}} </a> </td>
+            <td class="">{{s.code}}</td>
+            <td class=""> <a style="color: inherit;" href="{% url 'StudentAttendance' s.id %}"> {{s.prenom}} {{ s.nom}} </a> </td>
             <td class="">{{s.sections}}</td>
             <td class="">{{s.number_phone}}</td>
         </tr>

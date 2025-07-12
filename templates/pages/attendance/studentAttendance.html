@@ -34,12 +34,12 @@
     <div class="col-12 col-md-9 col-lg-10 p-4">
       <div class="card w-100 shadow">
         <div class="card-body">
-          <h5 class="card-title">{{user.firstname}} {{user.lastname}}</h5>
+          <h5 class="card-title">{{student.prenom}} {{student.nom}}</h5>
         </div>
         <ul class="list-group list-group-flush">
           <li class="list-group-item">
             <i class="fas fa-id-card"></i>
-            الاسم الكامل: {{ student.first_name }} {{ student.last_name }}
+            الاسم الكامل: {{ student.prenom }} {{ student.nom }}
           </li>
           <li class="list-group-item">
             <i class="fas fa-chalkboard"></i>
@@ -47,7 +47,7 @@
           </li>
           <li class="list-group-item">
             <i class="fas fa-id-badge"></i>
-            رمز مسار: {{ student.massar_num }}
+            رمز مسار: {{ student.code }}
           </li>
           <li class="list-group-item">
             <i class="fas fa-phone"></i>

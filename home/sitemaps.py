@@ -2,7 +2,7 @@ from django.contrib.sitemaps import Sitemap
 from .models import (
     Announce, Home, Subject, Section, Course,
     Student, Staff, Activities, HomeWork,
-    ExamCorrection, Classe, Report, Absence
+    ExamCorrection,  Report, Absence
 )
 from django.utils.timezone import now
 

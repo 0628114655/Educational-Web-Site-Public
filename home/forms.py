@@ -55,7 +55,7 @@ class UserRegistrationForm(forms.ModelForm):
             raise forms.ValidationError('كلمتا المرور لا تتطابقان!')
         
         if user_type == 'student':
-            if not Student.objects.filter(first_name=firstname,  last_name = lastname , massar_num=username,).exists():
+            if not Student.objects.filter(prenom=firstname,  nom = lastname , code=username,).exists():
                 raise forms.ValidationError('المعلومات لا تطابق أي تلميذ بالمؤسسة.')
         elif user_type == 'staff':
             if not Staff.objects.filter(FirstName=firstname, LastName = lastname,  PPR=username, ).exists():
@@ -166,26 +166,6 @@ class Add_exam_correction(forms.ModelForm):
             'section': forms.SelectMultiple(attrs={'class': 'form-control my-2'}),
 
         }
-
-class Add_exam_mark(forms.ModelForm):
-    first_mark = forms.DecimalField(label='نقطة الفرض الأول:', widget=forms.NumberInput(attrs = {'class' : 'form-control'}))
-    second_mark = forms.DecimalField(label='نقطة الفرض الثاني:', widget=forms.NumberInput(attrs = {'class' : 'form-control'}))
-    third_mark = forms.DecimalField(label='نقطة الفرض الثالث:', widget=forms.NumberInput(attrs = {'class' : 'form-control'}))
-    class Meta:
-        model =  ExamMark
-        fields = ['student', 'first_mark', 'second_mark', 'third_mark', 'subject', 'section']
-
-        labels = {
-                    'subject': 'المادة',
-                    'student': 'التلميذ',
-                    'section': 'القسم',
-            }
-
-        widgets = {
-        'student': forms.Select(attrs={'class': 'form-control'}),
-        'subject': forms.Select(attrs={'class': 'form-control', }),
-        'section': forms.SelectMultiple(attrs={'class': 'form-control'}),
-                        }
 
 class Add_activity(forms.ModelForm):
     title = forms.CharField(label='عنوان النشاط', widget=forms.TextInput(attrs={'class' : 'form-control',}))
