@@ -199,7 +199,7 @@ def add_activity (request):
                         Image.objects.create(
                             title = image_form.get('title'),
                             image = image_form.get('image'),
-                            activity =activity
+                            activity = activity
                         )
             
             messages.success (request, 'لقد تمت إضافة النشاط بنجاح.')
